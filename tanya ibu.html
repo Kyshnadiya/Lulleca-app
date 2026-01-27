@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lulleca AI -  Lullaby.eca</title>
+    <style>
+        :root {
+            --sage-bg: #f1f8e9;      /* Hijau lumut sangat muda */
+            --sage-nav: #c5e1a5;     /* Hijau lumut muda navigasi */
+            --sage-accent: #689f38;  /* Hijau lumut tegas untuk tombol/header */
+            --navy-dark: #2c3e50;
+            --white: #ffffff;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            margin: 0; padding: 0; 
+            background-color: var(--sage-bg);
+            color: var(--navy-dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header { 
+            background: var(--sage-accent); 
+            color: white; 
+            padding: 1rem; 
+            text-align: center; 
+        }
+        header h1 { margin: 0; font-size: 1.5rem; }
+        header p { margin: 5px 0 0; font-size: 0.8rem; opacity: 0.9; }
+
+        nav { 
+            background: var(--sage-nav); 
+            padding: 0.7rem; 
+            text-align: center; 
+            position: sticky; top: 0; z-index: 1000;
+            overflow-x: auto; white-space: nowrap;
+        }
+        nav a { color: var(--navy-dark); margin: 0 12px; text-decoration: none; font-weight: bold; font-size: 0.85rem; }
+
+        .chat-container { 
+            flex: 1; display: flex; flex-direction: column;
+            max-width: 800px; margin: 0 auto; width: 100%;
+            padding-bottom: 100px;
+        }
+
+        #chat-window { padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+
+        .bubble { max-width: 85%; font-size: 1rem; line-height: 1.6; }
+        .ai { align-self: flex-start; position: relative; padding-left: 30px; }
+        .ai::before { content: "🍃"; position: absolute; left: 0; top: 0; font-size: 1.2rem; }
+        .user { align-self: flex-end; background: var(--sage-nav); padding: 10px 18px; border-radius: 20px; }
+
+        .input-wrapper {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            padding: 20px; background: linear-gradient(transparent, var(--sage-bg) 20%);
+        }
+        .input-group {
+            max-width: 700px; margin: 0 auto; display: flex; align-items: center;
+            background: white; padding: 8px 15px; border-radius: 30px;
+            border: 1px solid var(--sage-nav); box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        input { flex: 1; border: none; padding: 10px; outline: none; background: transparent; }
+        
+        button { border: none; padding: 10px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+        #btnKirim { background: var(--sage-accent); color: white; margin-left: 5px; }
+        #btnGameMenu { background: #8d6e63; color: white; }
+
+        /* MODAL GAME */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center;
+        }
+        .modal-box { background: white; padding: 20px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; }
+        canvas { background: #e3f2fd; border-radius: 10px; display: block; margin: 10px auto; border: 2px solid #689f38; touch-action: none;}
+
+        @media (max-width: 600px) {
+            nav a { font-size: 0.75rem; margin: 0 8px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Lulleca AI</h1>
+    <p>Asisten Digital Ibu Pintar Sehat</p>
+</header>
+
+<nav>
+    <a href="index.html">Beranda</a>
+    <a href="kehamilan.html">Kehamilan</a>
+    <a href="persalinan.html">Persalinan</a>
+    <a href="nifas.html">Nifas</a>
+    <a href="bbl.html">Bayi Baru Lahir</a>
+    <a href="KB.html">KB</a>
+    <a href="jurnal.html">Jurnal Kesehatan</a>
+    <a href="tanya ibu.html">Lulleca AI</a>
+	 <a href="gizi.html">Lulleca Gizi</a>
+</nav>
+
+<div class="chat-container">
+    <div id="chat-window">
+        <div id="welcome" style="text-align: center; margin-top: 50px; color: var(--sage-accent);">
+            <h1>Halo, Bunda ✨</h1>
+            <p>Silakan bertanya atau pilih game untuk bersantai.</p>
+        </div>
+    </div>
+
+    <div class="input-wrapper">
+        <div class="input-group">
+            <input type="text" id="userInput" placeholder="Tanya sesuatu..." autocomplete="off">
+            <button type="button" id="btnGameMenu" onclick="openMenu()">🎮 Game</button>
+            <button type="button" id="btnKirim">Kirim</button>
+        </div>
+    </div>
+</div>
+
+<div id="menuModal" class="modal" onclick="closeAllModals(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <h3>Pilih Game Bunda</h3>
+        <button onclick="startMitosGame()" style="background:var(--sage-accent); color:white; width:100%; margin: 10px 0; padding: 15px;">1. Mitos atau Fakta</button>
+        <button onclick="startFlyGame()" style="background:#5cacee; color:white; width:100%; margin: 10px 0; padding: 15px;">2. Fly Bird (Flappy)</button>
+        <button onclick="closeAllModals()" style="background:#ccc; width:100%;">Batal</button>
+    </div>
+</div>
+
+<div id="mitosModal" class="modal">
+    <div class="modal-box">
+        <h2 style="color:var(--sage-accent)">Mitos atau Fakta?</h2>
+        <p id="gameQuest" style="font-weight: bold; min-height: 50px;"></p>
+        <button onclick="checkMitos(true)" style="background:#4caf50; color:white; padding: 10px 20px;">FAKTA</button>
+        <button onclick="checkMitos(false)" style="background:#f44336; color:white; padding: 10px 20px;">MITOS</button>
+        <p id="gameFeedback" style="margin-top: 15px;"></p>
+        <button onclick="closeAllModals()" style="margin-top: 10px;">Tutup</button>
+    </div>
+</div>
+
+<div id="flyModal" class="modal">
+    <div class="modal-box" style="position: relative;">
+        <h3 style="margin-top:0">Fly Bird Bunda 🐦</h3>
+        <div style="display: flex; justify-content: space-around; font-weight: bold; margin-bottom: 5px;">
+            <span>Skor: <span id="currentScore">0</span></span>
+            <span>Terbaik: <span id="bestScore">0</span></span>
+        </div>
+        <canvas id="flyCanvas" width="300" height="400"></canvas>
+        
+        <div id="gameOverUI" style="display:none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,0.9); padding: 20px; border-radius: 15px; border: 2px solid var(--sage-accent); width: 70%;">
+            <h4 style="color:red; margin:0">Yah, Jatuh!</h4>
+            <button onclick="resetFlyGame()" style="background:var(--sage-accent); color:white; margin-top:10px; width:100%;">Main Lagi</button>
+        </div>
+
+        <button onclick="closeAllModals()" style="background:var(--navy-dark); color:white; width:100%; margin-top:10px;">Berhenti</button>
+    </div>
+</div>
+<footer>
+    <b>Kaiyisah Nadiya Hafizah</b><br>
+    Asuhan Kebidanan Komprehensif di Puskesmas Simpang Rimba<br>
+    Lullaby.eca 2026
+</footer>
+<script>
+    // --- TELEGRAM CONFIG ---
+    const TELEGRAM_TOKEN = "8151365194:AAFMl_JKjNFVTvo_8sJvhuieE1HnXZRaySc";
+    const TELEGRAM_CHAT_ID = "6435649470";
+
+// --- 2. AMBIL DATA IDENTITAS LOGIN ---
+    const namaUser = localStorage.getItem('user_nama') || "Bunda Tanpa Nama";
+    const waUser = localStorage.getItem('user_wa') || "Tidak ada No WA";
+
+    async function kirimKeTelegram(pesanKeterangan) {
+        const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+        
+        // Format Pesan Lengkap dengan Identitas
+        const pesanLengkap = `💬 <b>PERTANYAAN LULLECA AI</b>\n` +
+                             `----------------------------\n` +
+                             `👤 <b>Nama:</b> ${namaUser}\n` +
+                             `📱 <b>WA:</b> ${waUser}\n` +
+                             `📝 <b>Pertanyaan:</b>\n<i>${pesanKeterangan}</i>\n` +
+                             `----------------------------\n` +
+                             `⏰ <b>Waktu:</b> ${new Date().toLocaleString('id-ID')}`;
+
+        try {
+            await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    chat_id: TELEGRAM_CHAT_ID,
+                    text: pesanLengkap,
+                    parse_mode: "HTML"
+                })
+            });
+        } catch (error) {
+            console.error("Gagal kirim ke Telegram", error);
+        }
+    }
+
+    // --- CHAT LOGIC ---
+    const input = document.getElementById('userInput');
+    const btn = document.getElementById('btnKirim');
+    const chat = document.getElementById('chat-window');
+    const welcome = document.getElementById('welcome');
+
+    function kirim() {
+        const pesan = input.value.trim();
+        if (!pesan) return;
+        if (welcome) welcome.style.display = 'none';
+
+        const u = document.createElement('div'); u.className = 'bubble user'; u.innerText = pesan;
+        chat.appendChild(u); input.value = ""; window.scrollTo(0, document.body.scrollHeight);
+
+        // KIRIM PERTANYAAN IBU KE TELEGRAM
+        kirimKeTelegram(`<b>📩 PERTANYAAN BARU (BIDAN AI)</b>\n\n<b>Pesan Bunda:</b>\n<i>${pesan}</i>\n\n<b>Waktu:</b> ${new Date().toLocaleString('id-ID')}`);
+
+       setTimeout(() => {
+            const t = pesan.toLowerCase();
+            let bot = "Wah, info menarik Bunda! Sebaiknya konsultasikan juga dengan Bidan Kaiyisah ya.";
+
+            // LOGIKA JAWABAN BERDASARKAN PROPOSAL
+            // 1. Umum & Greeting
+            if (t.includes("halo") || t.includes("hai")) {
+                bot = "Halo Bunda! Ada yang bisa Bidan AI bantu terkait kehamilan atau persalinan?";
+            } 
+            
+            // 2. Kehamilan (Trimester III & Umum)
+            else if (t.includes("kunjungan") && t.includes("hamil")) {
+                bot = "Sesuai standar, minimal Bunda melakukan 6 kali kunjungan ANC selama kehamilan untuk memantau kesehatan janin.";
+            } else if (t.includes("tanda bahaya") && t.includes("hamil")) {
+                bot = "Waspadai: gerakan janin berkurang (<10 kali/12 jam), ketuban pecah dini, nyeri perut hebat, atau pendarahan.";
+            } else if (t.includes("gerak") && t.includes("janin")) {
+                bot = "Normalnya gerakan janin terasa minimal 10 kali dalam periode 12 jam, Bunda.";
+            } else if (t.includes("tekanan darah") || t.includes("tensi")) {
+                bot = "Tekanan darah normal adalah di bawah 140/90 mmHg. Jika lebih, waspada risiko hipertensi kehamilan.";
+            } else if (t.includes("lila")) {
+                bot = "LiLA (Lingkar Lengan Atas) normal minimal 23,5 cm untuk mencegah risiko bayi berat lahir rendah (BBLR).";
+            } else if (t.includes("tablet tambah darah") || t.includes("ttd")) {
+                bot = "Bunda wajib minum minimal 90 tablet tambah darah selama hamil untuk mencegah anemia.";
+            } else if (t.includes("asam folat")) {
+                bot = "Asam folat penting untuk mendukung pertumbuhan rahim dan perkembangan saraf janin.";
+            } else if (t.includes("olahraga") || t.includes("senam")) {
+                bot = "Bunda bisa jalan pagi, yoga, atau aktivitas rumah ringan. Hindari gerakan yang terlalu berat ya.";
+            } else if (t.includes("sembelit") || t.includes("konstipasi")) {
+                bot = "Sembelit karena hormon progesteron bisa diatasi dengan minum 6-8 gelas air/hari dan makan serat.";
+            } else if (t.includes("bengkak") || t.includes("edema")) {
+                bot = "Kaki bengkak bisa dikurangi dengan mengurangi garam dan mengangkat kaki 20 menit setiap 2-3 jam.";
+            } else if (t.includes("susah tidur") || t.includes("insomnia")) {
+                bot = "Susah tidur di trimester 3 sering terjadi. Cobalah mandi air hangat atau minum susu hangat sebelum tidur.";
+            } else if (t.includes("nyeri punggung")) {
+                bot = "Gunakan bantal penyangga saat tidur dan hindari sepatu hak tinggi untuk mengurangi nyeri punggung.";
+            } else if (t.includes("akupresur") || t.includes("l14")) {
+                bot = "Stimulasi titik akupresur L14 dan SP6 bisa dilakukan secara mandiri mulai usia kehamilan 37 minggu.";
+            }
+
+            // 3. Persalinan
+            else if (t.includes("tanda") && t.includes("lahir")) {
+                bot = "Tanda persalinan meliputi mulas yang teratur (kontraksi), keluar lendir darah, atau pecah ketuban.";
+            } else if (t.includes("pembukaan")) {
+                bot = "Pembukaan lengkap ditandai dengan diameter serviks mencapai 10 cm.";
+            } else if (t.includes("birth ball") || t.includes("gym ball")) {
+                bot = "Pemanfaatan Birth Ball sangat baik dilakukan di Kala I persalinan untuk mengurangi rasa nyeri.";
+            } else if (t.includes("nyeri") && t.includes("bersalin")) {
+                bot = "Nyeri persalinan bisa dikurangi dengan teknik pernapasan, pijatan lembut, atau posisi yang nyaman.";
+            } else if (t.includes("ketuban pecah")) {
+                bot = "Jika ketuban pecah sebelum ada mules, segera ke fasilitas kesehatan karena risiko infeksi.";
+            }
+
+            // 4. Nifas & Menyusui
+            else if (t.includes("katuk")) {
+                bot = "Daun katuk mengandung steroid dan polifenol yang efektif meningkatkan produksi ASI.";
+            } else if (t.includes("cara rebus katuk")) {
+                bot = "Rebus 200g daun katuk dalam 400-600ml air mendidih selama 3-5 menit saja agar zat aktifnya tidak rusak.";
+            } else if (t.includes("asi eksklusif")) {
+                bot = "ASI eksklusif diberikan selama 6 bulan pertama tanpa tambahan makanan atau minuman lain.";
+            } else if (t.includes("kunjungan nifas")) {
+                bot = "Kunjungan nifas (KF) dilakukan 4 kali: 6-8 jam, hari ke-3-7, minggu ke-2, dan minggu ke-6.";
+            } else if (t.includes("lokia") || t.includes("nifas pendarahan")) {
+                bot = "Lokia adalah cairan yang keluar masa nifas. Jika berbau busuk atau pendarahan sangat banyak, segera lapor bidan.";
+            } else if (t.includes("vitamin a")) {
+                bot = "Ibu nifas memerlukan 2 kapsul Vitamin A (200.000 IU) untuk kesehatan ibu dan kualitas ASI.";
+            }
+
+            // 5. Bayi Baru Lahir (BBL)
+            else if (t.includes("tanda bahaya") && t.includes("bayi")) {
+                bot = "Waspada jika bayi kuning, sesak napas, bayi malas menetek, atau tali pusat kemerahan/berbau.";
+            } else if (t.includes("tali pusat")) {
+                bot = "Jaga tali pusat tetap kering dan bersih. Jangan dibubuhi ramuan apa pun.";
+            } else if (t.includes("suhu bayi")) {
+                bot = "Suhu normal bayi berkisar antara 36,5 - 37,5 derajat Celcius.";
+            }
+
+            // 6. Keluarga Berencana (KB)
+            else if (t.includes("kb") || t.includes("kontrasepsi")) {
+                bot = "Ada metode jangka panjang (IUD, Implan) dan jangka pendek (Suntik, Pil, Kondom). Mana yang Bunda minati?";
+            } else if (t.includes("kb") && t.includes("menyusui")) {
+                bot = "Untuk ibu menyusui, disarankan menggunakan KB non-hormonal atau yang hanya mengandung progestin agar ASI lancar.";
+            }
+			// 7. Gizi & Keluhan Umum Kehamilan
+            else if (t.includes("makan") && t.includes("porsi")) {
+                bot = "Pada trimester 3, Bunda butuh tambahan energi sekitar 300 kkal per hari. Makanlah porsi kecil tapi sering ya.";
+            } else if (t.includes("kopi") || t.includes("kafein")) {
+                bot = "Sebaiknya batasi kopi ya Bunda, maksimal 1 cangkir sehari karena kafein berlebih bisa menghambat penyerapan zat besi.";
+            } else if (t.includes("susu")) {
+                bot = "Susu hamil bagus untuk kalsium, tapi pastikan Bunda tetap makan makanan bergizi seimbang juga.";
+            } else if (t.includes("buah") && t.includes("hamil")) {
+                bot = "Buah yang kaya vitamin C seperti jeruk sangat bagus untuk membantu penyerapan zat besi dari tablet TTD.";
+            } else if (t.includes("keputihan")) {
+                bot = "Keputihan normal itu bening/putih dan tidak gatal. Jika berwarna hijau, berbau, atau gatal, segera lapor Bidan ya.";
+            } else if (t.includes("sesak napas")) {
+                bot = "Sesak napas di akhir kehamilan sering terjadi karena rahim membesar menekan diafragma. Duduklah tegak untuk membantu.";
+            } else if (t.includes("sering kencing")) {
+                bot = "Ini normal karena kepala janin mulai turun menekan kandung kemih. Jangan dikurangi minumnya, tapi kurangi minum sebelum tidur.";
+            } else if (t.includes("kram kaki")) {
+                bot = "Bunda bisa konsumsi makanan tinggi kalsium dan lakukan peregangan kaki sebelum tidur.";
+            }
+
+            // 8. Evidence Based & Persiapan Lahir
+            else if (t.includes("pijat oksitosin")) {
+                bot = "Pijat oksitosin di sepanjang tulang belakang sangat bagus dilakukan suami untuk merangsang pengeluaran ASI.";
+            } else if (t.includes("sp6") || t.includes("titik kaki")) {
+                bot = "Titik SP6 (4 jari di atas mata kaki dalam) bisa dipijat untuk membantu induksi alami dan mengurangi nyeri.";
+            } else if (t.includes("jalan") && t.includes("cepat")) {
+                bot = "Jalan santai sangat disarankan untuk membantu kepala janin cepat masuk ke panggul (Engagement).";
+            } else if (t.includes("tas bersalin") || t.includes("perlengkapan")) {
+                bot = "Siapkan baju bayi, baju ibu (bukaan depan), kain panjang, pembalut nifas, dan dokumen (Buku KIA, KTP, BPJS).";
+            } else if (t.includes("pendamping")) {
+                bot = "Sesuai filosofi asuhan, kehadiran suami atau keluarga saat bersalin sangat membantu ketenangan mental Bunda.";
+            }
+
+            // 9. Pasca Salin (Nifas) & ASI
+            else if (t.includes("mobilisasi") || t.includes("miring")) {
+                bot = "Setelah lahir normal, 2 jam pertama Bunda sudah boleh miring kanan-kiri dan belajar duduk secara bertahap.";
+            } else if (t.includes("senam nifas")) {
+                bot = "Senam nifas bisa dimulai hari ke-2 untuk mengencangkan otot perut dan mempercepat pemulihan rahim.";
+            } else if (t.includes("luka jahitan")) {
+                bot = "Jaga luka jahitan tetap bersih dan kering. Cukup cuci dengan air bersih setiap habis buang air dan keringkan.";
+            } else if (t.includes("asi") && t.includes("sedikit")) {
+                bot = "Jangan stres Bunda! Produksi ASI mengikuti prinsip supply & demand. Semakin sering disusukan, semakin banyak produksinya.";
+            } else if (t.includes("puting lecet")) {
+                bot = "Pastikan perlekatan mulut bayi benar (areola masuk semua). Oleskan sedikit ASI pada puting yang lecet setelah menyusui.";
+            } else if (t.includes("payudara bengkak")) {
+                bot = "Kompres hangat sebelum menyusui untuk melancarkan, dan kompres dingin setelah menyusui untuk mengurangi nyeri.";
+            } else if (t.includes("mandi") && t.includes("nifas")) {
+                bot = "Ibu nifas boleh mandi seperti biasa, justru harus menjaga kebersihan tubuh ya Bunda.";
+            }
+
+            // 10. Bayi & KB
+            else if (t.includes("memandikan bayi")) {
+                bot = "Gunakan air hangat suam-suam kuku. Mandikan bayi di ruangan yang hangat agar bayi tidak kedinginan (hipotermi).";
+            } else if (t.includes("bayi kuning")) {
+                bot = "Jika kuning muncul <24 jam atau menyebar sampai kaki, segera ke dokter. Jika kuning ringan, sering-seringlah menyusui.";
+            } else if (t.includes("jemur bayi")) {
+                bot = "Menjemur bayi bagus untuk vitamin D, tapi hindari sinar matahari langsung ke mata bayi dan jangan terlalu lama.";
+            } else if (t.includes("pola tidur bayi")) {
+                bot = "Bayi baru lahir biasanya tidur 16-20 jam sehari, tapi akan terbangun setiap 2-3 jam untuk menetek.";
+            } else if (t.includes("popok")) {
+                bot = "Ganti popok bayi setiap kali basah agar terhindar dari ruam popok.";
+            } else if (t.includes("bedong")) {
+                bot = "Boleh dibedong untuk memberi rasa hangat, tapi jangan terlalu ketat karena bisa mengganggu pertumbuhan panggul.";
+            } else if (t.includes("imunisasi hb0")) {
+                bot = "Imunisasi Hepatitis B (HB-0) diberikan segera setelah lahir (<24 jam) untuk mencegah penularan virus dari ibu.";
+            } else if (t.includes("kb suntik")) {
+                bot = "Suntik 3 bulan (progestin) aman untuk ibu menyusui karena tidak mengganggu produksi ASI.";
+            } else if (t.includes("iud") || t.includes("spiral")) {
+                bot = "IUD adalah metode jangka panjang yang sangat efektif dan bisa dipasang langsung setelah plasenta lahir.";
+            } else if (t.includes("hubungan") && t.includes("nifas")) {
+                bot = "Hubungan suami istri sebaiknya dilakukan setelah masa nifas selesai (sekitar 40 hari) dan luka pulih.";
+            }
+			// --- JAWABAN SPESIFIK USER ---
+            if (t.includes("marah")) {
+                bot = "Wajar sekali jika Bunda merasa ingin marah atau emosional. Ini biasanya disebabkan oleh perubahan hormon drastis setelah melahirkan, kelelahan karena kurang tidur, dan adaptasi peran baru. Jangan dipendam sendiri ya Bunda, komunikasikan dengan suami dan sempatkan istirahat saat bayi tidur.";
+            } else if (t.includes("asi ga keluar") || t.includes("asi belum keluar")) {
+                bot = "Tenang Bunda, pada 1-3 hari pertama setelah melahirkan, ASI memang biasanya keluar sedikit (Kolostrum). Lambung bayi pun masih sebesar biji kelereng, jadi cukup dengan sedikit ASI. Terus susui bayi agar hormon oksitosin bekerja, konsumsi rebusan daun katuk, dan hindari stres agar ASI cepat lancar.";
+            } else if (t.includes("babyblues") || t.includes("baby blues")) {
+                bot = "Baby blues adalah perasaan sedih, cemas, atau lelah yang dialami sekitar 80% ibu nifas di minggu pertama. Jika ini terjadi, Bunda butuh dukungan keluarga. Namun, jika perasaan ini menetap lebih dari 2 minggu dan Bunda merasa sangat putus asa, segera konsultasikan ke bidan atau dokter untuk mencegah postpartum depression.";
+            }
+
+            // --- TAMBAHAN 30 PERTANYAAN (AGAK PANJANG & MENDALAM) ---
+            
+            // Kehamilan
+            else if (t.includes("asam lambung") || t.includes("mual")) {
+                bot = "Mual atau asam lambung meningkat karena rahim makin besar menekan lambung. Tipsnya: makan porsi kecil tapi sering (5-6 kali sehari), hindari makanan pedas dan asam, serta jangan langsung berbaring setelah makan.";
+            } else if (t.includes("hb") && t.includes("rendah")) {
+                bot = "HB rendah (Anemia) bisa membuat Bunda cepat lelah dan berisiko pendarahan saat lahir. Selain tablet TTD, perbanyak makan protein hewani (hati ayam, daging merah) dan sayuran hijau serta hindari minum teh/kopi saat makan.";
+            } else if (t.includes("kepala") && t.includes("panggul")) {
+                bot = "Untuk membantu kepala janin masuk panggul, Bunda bisa rutin jalan pagi, melakukan posisi sujud (knee chest) selama 10 menit setiap hari, dan rutin melakukan gerakan panggul dengan Birth Ball.";
+            } else if (t.includes("kepala pusing") || t.includes("pandangan kabur")) {
+                bot = "Waspada Bunda! Pusing hebat disertai pandangan kabur dan nyeri ulu hati bisa menjadi tanda Preeklampsia (keracunan kehamilan). Segera cek tekanan darah Bunda di Puskesmas Simpang Rimba ya.";
+            } else if (t.includes("berat badan") && t.includes("janin")) {
+                bot = "BB janin kurang bisa dipicu asupan nutrisi ibu atau aliran darah plasenta. Konsumsilah protein tinggi (telur rebus 2 butir/hari) dan istirahat miring kiri untuk memaksimalkan aliran nutrisi ke janin.";
+            } else if (t.includes("vitamin c")) {
+                bot = "Vitamin C sangat penting untuk membantu penyerapan zat besi di usus. Jadi, minumlah tablet tambah darah (TTD) dengan air putih atau jus jeruk, jangan dengan teh atau susu karena akan menghambat penyerapannya.";
+            } else if (t.includes("miring kiri")) {
+                bot = "Miring kiri sangat disarankan karena posisi ini mencegah rahim menekan pembuluh darah besar ibu, sehingga aliran darah dan oksigen ke janin menjadi lebih lancar.";
+            }
+
+            // Persalinan
+            else if (t.includes("induksi")) {
+                bot = "Induksi adalah tindakan untuk merangsang kontraksi rahim. Secara alami, Bunda bisa melakukan hubungan suami istri (sperma mengandung prostaglandin) atau stimulasi puting payudara untuk memicu oksitosin.";
+            } else if (t.includes("ketuban") && t.includes("warna")) {
+                bot = "Air ketuban normal berwarna jernih atau sedikit keruh. Jika ketuban pecah dan berwarna hijau kental, itu tanda bayi stres (fetal distress) dan Bunda harus segera ke ruang persalinan.";
+            } else if (t.includes("ari-ari") || t.includes("plasenta")) {
+                bot = "Setelah bayi lahir, ari-ari biasanya lahir dalam 15-30 menit. Bidan akan melakukan Manajemen Aktif Kala III (suntik oksitosin dan peregangan tali pusat) agar ari-ari lahir lengkap dan mencegah pendarahan.";
+            } else if (t.includes("sobekan") || t.includes("episiotomi")) {
+                bot = "Sobekan jalan lahir sering terjadi pada persalinan pertama. Untuk meminimalkan sobekan, saat mengejan ikutilah instruksi bidan, jangan mengangkat pantat, dan lakukan pijat perineum di akhir kehamilan.";
+            }
+
+            // Nifas & Menyusui
+            else if (t.includes("makanan") && t.includes("pantang")) {
+                bot = "Sebenarnya tidak ada pantangan makanan untuk ibu nifas. Bunda justru butuh banyak protein (ikan, telur, ayam) agar luka jahitan cepat sembuh. Jangan 'mutih' (hanya makan nasi garam) karena menghambat kesembuhan.";
+            } else if (t.includes("kb") && t.includes("mal")) {
+                bot = "Metode Amenore Laktasi (MAL) bisa jadi KB alami asalkan: Bunda menyusui eksklusif, belum haid sama sekali, dan bayi berumur kurang dari 6 bulan. Jika salah satu tidak terpenuhi, segera gunakan KB lain.";
+            } else if (t.includes("perut") && t.includes("kendur")) {
+                bot = "Perut kendur setelah lahir itu normal. Bunda bisa memakai bengkung atau korset untuk kenyamanan, tapi yang paling efektif adalah senam nifas untuk mengencangkan otot perut kembali.";
+            } else if (t.includes("bendungan asi")) {
+                bot = "Bendungan ASI ditandai payudara keras, bengkak, dan nyeri. Cara mengatasinya: kompres hangat, pijat lembut, dan pastikan bayi menyusu sampai payudara benar-benar kosong.";
+            } else if (t.includes("kapan") && t.includes("kb")) {
+                bot = "Sesuai standar pelayanan di Puskesmas Simpang Rimba, Bunda disarankan sudah memutuskan metode KB sejak masa hamil atau segera setelah melahirkan (KB Pasca Persalinan) sebelum pulang ke rumah.";
+            }
+
+            // Bayi Baru Lahir
+            else if (t.includes("bayi") && t.includes("menangis")) {
+                bot = "Bayi menangis adalah cara komunikasi. Cek apakah popoknya basah, apakah dia lapar, gerah, atau ingin dipeluk. Jika menangis terus menerus dengan nada tinggi dan sulit ditenangkan, periksakan suhunya.";
+            } else if (t.includes("bab bayi")) {
+                bot = "BAB bayi baru lahir (Mekonium) berwarna hitam kehijauan. Setelah 3-5 hari, warna akan berubah menjadi kekuningan. Jika bayi tidak BAB dalam 24 jam pertama, segera lapor petugas kesehatan.";
+            } else if (t.includes("kolostrum")) {
+                bot = "Kolostrum adalah ASI pertama yang berwarna kekuningan dan kental. Ini mengandung sangat banyak antibodi (kekebalan tubuh) untuk bayi. Jangan dibuang ya Bunda, itu 'imunisasi' pertama bayi.";
+            } else if (t.includes("suhu") && t.includes("dingin")) {
+                bot = "Bayi mudah mengalami hipotermi (kedinginan). Pastikan bayi selalu diselimuti, pakai topi, dan gunakan metode kanguru (dekap bayi di dada ibu) jika bayi terasa dingin.";
+            } else if (t.includes("bayi") && t.includes("sendawa")) {
+                bot = "Setiap habis menyusu, tegakkan bayi di bahu Bunda dan tepuk punggungnya lembut sampai bersendawa. Ini penting agar bayi tidak gumoh atau tersedak.";
+            }
+
+            // Umum & Remaja/KB (Sesuai Proposal CoC)
+            else if (t.includes("ttd") && t.includes("mual")) {
+                bot = "Jika minum TTD membuat mual, cobalah minum di malam hari sebelum tidur. Jangan diminum pagi hari saat perut kosong. TTD sangat penting untuk cadangan zat besi Bunda selama persalinan.";
+            } else if (t.includes("keputihan") && t.includes("gatal")) {
+                bot = "Keputihan gatal dan berbau busuk menandakan infeksi jamur atau bakteri. Gantilah celana dalam sesering mungkin dan pastikan area kewanitaan selalu kering. Konsultasikan untuk terapi obat.";
+            } else if (t.includes("tespek") || t.includes("testpack")) {
+                bot = "Gunakan urin pertama di pagi hari untuk hasil tespek yang akurat. Jika garisnya samar, Bunda bisa ulangi 3-7 hari kemudian atau langsung ke Puskesmas untuk pemeriksaan laboratorium.";
+            } else if (t.includes("imunisasi") && t.includes("bcg")) {
+                bot = "Imunisasi BCG diberikan untuk mencegah penyakit TBC pada bayi. Biasanya muncul benjolan kecil setelah beberapa minggu di bekas suntikan, itu normal dan jangan ditekan atau diberi obat.";
+            } else if (t.includes("timbangan") && t.includes("bayi")) {
+                bot = "Bawa bayi ke Posyandu setiap bulan untuk memantau berat badan di Buku KIA. Jika grafik berat badan tidak naik (T), segera konsultasikan dengan bidan terkait pola asuh dan ASI.";
+            } else if (t.includes("pijat bayi")) {
+                bot = "Pijat bayi sehat bisa dilakukan sendiri di rumah. Gunakan minyak zaitun atau baby oil. Pijatan lembut meningkatkan bonding antara Bunda dan bayi serta membuat tidur bayi lebih nyenyak.";
+            } else if (t.includes("hiv") || t.includes("sifilis") || t.includes("hepatitis")) {
+                bot = "Pemeriksaan Triple Eliminasi (HIV, Sifilis, Hepatitis B) wajib dilakukan ibu hamil minimal 1 kali agar jika ada infeksi bisa segera diobati dan tidak menular ke janin.";
+            } else if (t.includes("iud") && t.includes("bergeser")) {
+                bot = "IUD jarang sekali bergeser jika dipasang dengan benar. Bunda bisa mengecek benang IUD secara mandiri setiap habis haid. Jika benang terasa hilang atau nyeri saat berhubungan, segera kontrol ke bidan.";
+            } else if (t.includes("usia") && t.includes("hamil")) {
+                bot = "Usia paling aman untuk hamil adalah 20-35 tahun. Hamil di bawah 20 tahun atau di atas 35 tahun termasuk risiko tinggi dan memerlukan pengawasan lebih ketat dari petugas kesehatan.";
+            }
+			
+			// 11. Validasi Perasaan & Interaksi Santai (Basa-basi AI)
+            else if (t.includes("kamu lagi apa") || t.includes("lagi apa")) {
+                bot = "Aku lagi nungguin Bunda nih! Aku siap stand-by 24 jam buat dengerin cerita Bunda atau jawab pertanyaan seputar kehamilan. Bunda sendiri sudah istirahat belum hari ini?";
+            } else if (t.includes("siapa kamu") || t.includes("nama kamu")) {
+                bot = "Aku Bidan AI, asisten digitalnya Bidan Kaiyisah. Tugas aku nemenin Bunda selama masa CoC (Continuity of Care) supaya Bunda sehat dan bayinya ceria!";
+            } else if (t.includes("terima kasih") || t.includes("makasih")) {
+                bot = "Sama-sama Bunda sayang! Senang banget bisa bantu. Jangan sungkan tanya lagi ya, Bidan AI selalu ada buat Bunda. Semangat!";
+            } else if (t.includes("capek") || t.includes("lelah")) {
+                bot = "Peluk jauh buat Bunda! Menjadi ibu itu memang tugas hebat yang melelahkan. Jangan dipaksa ya, Bun. Kalau capek, istirahat dulu, titip si kecil sebentar ke Ayah atau keluarga. Bunda juga butuh disayang.";
+            } else if (t.includes("takut") || t.includes("cemas") || t.includes("khawatir")) {
+                bot = "Wajar banget kalau Bunda merasa takut, apalagi menjelang persalinan. Tarik napas dalam ya, Bun... Bunda itu kuat. Tubuh Bunda sudah dirancang hebat untuk ini. Kita lalui bareng-bareng ya.";
+            } else if (t.includes("sedih") || t.includes("nangis")) {
+                bot = "Boleh kok kalau Bunda mau nangis, itu bukan tanda Bunda lemah. Perubahan hormon memang sering bikin perasaan jadi sensitif. Mau cerita lebih lanjut apa yang bikin Bunda sedih?";
+            } else if (t.includes("jelek") || t.includes("gemuk")) {
+                bot = "Bunda, dengerin aku ya: Bunda itu cantik banget! Perubahan tubuh itu adalah bukti perjuangan Bunda menghadirkan kehidupan baru. Fokus ke kesehatan ya, bukan ke bentuk badan.";
+            } else if (t.includes("kesepian")) {
+                bot = "Bunda nggak sendirian, ada Bidan AI di sini. Kalau suami lagi kerja, Bunda bisa dengerin musik tenang atau ajak ngobrol si kecil di dalam perut, dia denger lho suara Bunda!";
+            } else if (t.includes("bosan")) {
+                bot = "Lagi bosan ya? Coba deh buka menu 'Jurnal Kesehatan' di web ini, Bunda bisa catat perasaan Bunda hari ini atau baca-baca lagi tips tentang daun katuk biar makin siap pas nifas nanti.";
+            } else if (t.includes("semangat")) {
+                bot = "Wah, aku juga jadi ikut semangat! Suka banget sama energi positif Bunda. Pertahankan ya, karena bahagia itu menular ke bayi di dalam kandungan.";
+            } else if (t.includes("lapar")) {
+                bot = "Cek jam makan Bunda! Trimester 3 memang bikin cepat lapar karena bayi lagi tumbuh pesat. Coba cari cemilan sehat kayak buah atau kacang-kacangan yuk.";
+            } else if (t.includes("ngantuk") || t.includes("tidur")) {
+                bot = "Selamat istirahat, Bunda! Tidur miring kiri ya biar aliran oksigen ke janin maksimal. Semoga mimpinya indah!";
+            } else if (t.includes("sakit hati") || t.includes("kecewa")) {
+                bot = "Aku mengerti perasaan Bunda. Kadang orang sekitar nggak paham apa yang Bunda rasakan. Tenangkan pikiran dulu ya, tarik napas yang dalam.";
+            } else if (t.includes("nyaman")) {
+                bot = "Alhamdulillah kalau Bunda merasa nyaman. Kabari aku ya kalau ada apa-apa!";
+            } else if (t.includes("bingung")) {
+                bot = "Jangan bingung, Bun. Tanya aja satu-satu, aku bakal bantu jelasin pelan-pelan. Kita mulai dari mana dulu nih?";
+            } else if (t.includes("sayang bayi")) {
+                bot = "Bayinya pasti sayang banget juga sama Bunda! Dia beruntung punya Bunda yang perhatian banget sama kesehatannya sampai pakai aplikasi ini.";
+            } else if (t.includes("lucu")) {
+                bot = "Hehe, bisa aja Bunda ini. Aku kan AI yang didesain ramah kayak Bidan Kaiyisah!";
+            } else if (t.includes("curhat")) {
+                bot = "Boleh banget! Silakan tumpahkan semua di sini. Aku bakal simpan rahasia Bunda.";
+            } else if (t.includes("sabar")) {
+                bot = "Sabar ya Bunda hebat... Semua keluhan sakit saat hamil atau nifas ini sifatnya sementara kok, nanti kalau si kecil sudah peluk Bunda, semua rasanya terbayar lunas.";
+            } else if (t.includes("pintar")) {
+                bot = "Sesuai nama web ini: Ibu Pintar Sehat! Kalau Bundanya pintar cari informasi, bayinya juga pasti tumbuh sehat.";
+            } else if (t.includes("kangen")) {
+                bot = "Kangen siapa nih? Kalau kangen si kecil, elus perutnya yuk sambil diajak bicara, dia bisa ngerasain sentuhan Bunda lho.";
+            } else if (t.includes("pagi")) {
+                bot = "Selamat pagi Bunda yang luar biasa! Sudah minum air putih dan sarapan bergizi hari ini?";
+            } else if (t.includes("siang")) {
+                bot = "Selamat siang Bunda! Jangan lupa istirahat sebentar ya di sela aktivitasnya.";
+            } else if (t.includes("malam")) {
+                bot = "Malam Bunda! Waktunya relaksasi... Sudah minum rebusan daun katuknya (kalau lagi nifas) atau tablet tambah darahnya?";
+            } else if (t.includes("sakit semua") || t.includes("pegal")) {
+                bot = "Aduh, kasihan Bunda. Minta Ayah buat pijat ringan di punggung atau kaki yuk, itu bagus buat *bonding* kalian juga.";
+            } else if (t.includes("berdoa")) {
+                bot = "Amin... Berdoa memang obat paling tenang buat hati. Semoga Bunda dan bayi selalu dalam lindungan-Nya ya.";
+            } else if (t.includes("stres")) {
+                bot = "Stop dulu apa pun yang Bunda kerjakan. Tarik napas dari hidung, buang lewat mulut pelan-pelan. Ulangi 3 kali. Bunda berhak untuk merasa tenang.";
+            } else if (t.includes("bangga")) {
+                bot = "Aku juga bangga sama Bunda! Sudah berjuang sampai sejauh ini bukan hal yang mudah lho.";
+            } else if (t.includes("oke") || t.includes("siap")) {
+                bot = "Mantap! Ada lagi yang mau dibahas, Bunda Pintar?";
+            } else if (t.includes("bye") || t.includes("dadah")) {
+                bot = "Sampai jumpa lagi Bunda! Jaga kesehatan ya, aku selalu nungguin Bunda di sini.";
+            }
+
+// --- TAMBAHAN 10 PERTANYAAN BARU ---
+            else if (t.includes("anak rewel") || t.includes("bayi rewel")) {
+                bot = "Bayi rewel bisa karena lapar, popok basah, gerah, atau ingin didekap. Coba metode 'Skin to Skin' (peluk bayi tanpa baju di dada Bunda) untuk menenangkannya.";
+            } else if (t.includes("susah tidur") || t.includes("insomnia")) {
+                bot = "Susah tidur sering terjadi di trimester akhir. Cobalah mandi air hangat, minum susu hangat, dan gunakan bantal penyangga untuk menyangga perut Bunda.";
+            } else if (t.includes("gerak") && t.includes("janin")) {
+                bot = "Pastikan janin bergerak minimal 10 kali dalam 12 jam ya, Bun. Kalau gerakannya terasa berkurang drastis, segera hubungi Bidan!";
+            } else if (t.includes("payudara") && t.includes("sakit")) {
+                bot = "Jika payudara bengkak dan sakit, cobalah kompres hangat sebelum menyusui dan pastikan mulut bayi menempel dengan benar (areola masuk semua).";
+            } else if (t.includes("makan") && t.includes("ikan")) {
+                bot = "Bagus banget, Bun! Ikan kaya protein dan DHA untuk kecerdasan otak janin. Pastikan ikannya dimasak sampai benar-benar matang ya.";
+            } else if (t.includes("jahitan") && t.includes("lepas")) {
+                bot = "Jangan panik, Bun. Segera periksakan ke bidan jika ada pendarahan atau rasa nyeri hebat pada area jahitan agar bisa dicek kondisinya.";
+            } else if (t.includes("kb") && t.includes("suntik")) {
+                bot = "Suntik KB 3 bulan sangat cocok untuk ibu menyusui karena tidak mengganggu produksi ASI. Konsultasikan jadwalnya dengan Bidan Kaiyisah ya!";
+            } else if (t.includes("perut") && t.includes("kencang")) {
+                bot = "Perut kencang sesekali itu normal (Braxton Hicks). Tapi jika kencangnya teratur, makin sering, dan makin sakit, itu tanda persalinan akan tiba!";
+            } else if (t.includes("bab") && t.includes("bayi")) {
+                bot = "Warna BAB bayi ASI biasanya kuning cerah dan teksturnya agak lembek/berbiji. Itu normal banget kok, Bunda.";
+            } else if (t.includes("vitamin") && t.includes("rutin")) {
+                bot = "Pintar! Vitamin dan Tablet Tambah Darah harus diminum rutin agar Bunda tidak pucat dan bayi lahir sehat dengan berat yang cukup.";
+            }
+            const a = document.createElement('div'); a.className = 'bubble ai'; a.innerText = bot;
+            chat.appendChild(a); window.scrollTo(0, document.body.scrollHeight);
+        }, 800);
+    }
+    btn.onclick = kirim;
+    input.onkeypress = (e) => { if(e.key === 'Enter') kirim(); };
+
+    // --- MODAL CONTROL ---
+    function openMenu() { document.getElementById('menuModal').style.display = 'flex'; }
+    function closeAllModals() { 
+        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        gameRunning = false;
+    }
+
+    // --- GAME 1: MITOS ---
+    const games = [
+        { q: "Makan pedas bikin bayi belekan?", a: false, info: "Mitos! Belek pada bayi biasanya karena saluran air mata tersumbat." },
+        { q: "Ibu menyusui butuh banyak cairan?", a: true, info: "Fakta! Air putih sangat mendukung produksi ASI." }
+    ];
+    function startMitosGame() {
+        closeAllModals();
+        document.getElementById('mitosModal').style.display = 'flex';
+        const g = games[Math.floor(Math.random()*games.length)];
+        document.getElementById('gameQuest').innerText = g.q;
+        window.currentG = g;
+        document.getElementById('gameFeedback').innerText = "";
+    }
+    function checkMitos(ans) {
+        const f = document.getElementById('gameFeedback');
+        if(ans === window.currentG.a) f.innerHTML = "<b>Benar!</b><br>"+window.currentG.info;
+        else f.innerHTML = "<b style='color:red'>Salah.</b><br>"+window.currentG.info;
+        setTimeout(startMitosGame, 3000);
+    }
+
+ // --- GAME 2: FLY BIRD ---
+    const canvas = document.getElementById('flyCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('currentScore');
+    const bestEl = document.getElementById('bestScore');
+    const gameOverUI = document.getElementById('gameOverUI');
+
+    let birdY, birdV, pipes, gameRunning, score, bestScore = 0;
+    const gravity = 0.25;
+    const jump = -4.5;
+
+    function startFlyGame() {
+        closeAllModals();
+        document.getElementById('flyModal').style.display = 'flex';
+        resetFlyGame();
+    }
+
+    function resetFlyGame() {
+        birdY = 200;
+        birdV = 0;
+        pipes = [];
+        score = 0;
+        gameRunning = true;
+        scoreEl.innerText = score;
+        gameOverUI.style.display = 'none';
+        
+        // Tambah pipa pertama
+        pipes.push({ x: 300, h: 150 });
+        drawFly();
+    }
+
+    function drawFly() {
+        if (!gameRunning) return;
+
+        // Langit
+        ctx.fillStyle = "#e3f2fd";
+        ctx.fillRect(0, 0, 300, 400);
+
+        // Gravitasi Burung
+        birdV += gravity;
+        birdY += birdV;
+
+        // Gambar Burung (Badan Kuning, Sayap Putih)
+        ctx.fillStyle = "yellow";
+        ctx.beginPath();
+        ctx.arc(50, birdY, 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "black"; // Mata
+        ctx.fillRect(58, birdY - 5, 3, 3);
+        ctx.fillStyle = "orange"; // Paruh
+        ctx.fillRect(62, birdY, 5, 3);
+
+        // Gambar Pipa Kayu
+        pipes.forEach((p, i) => {
+            p.x -= 2;
+
+            // Warna Kayu Lumut
+            ctx.fillStyle = "#8d6e63"; 
+            ctx.fillRect(p.x, 0, 40, p.h); // Atas
+            ctx.fillRect(p.x, p.h + 120, 40, 400); // Bawah (Celah 120 agar lebih mudah)
+            
+            // Garis tekstur kayu sederhana
+            ctx.strokeStyle = "#5d4037";
+            ctx.strokeRect(p.x, 0, 40, p.h);
+            ctx.strokeRect(p.x, p.h + 120, 40, 400);
+
+            // Cek Tabrakan
+            if (p.x < 62 && p.x > 38) {
+                if (birdY < p.h || birdY > p.h + 120) {
+                    endGame();
+                }
+            }
+
+            // Hitung Skor
+            if (p.x === 50) {
+                score++;
+                scoreEl.innerText = score;
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestEl.innerText = bestScore;
+                }
+            }
+        });
+
+        // Hapus pipa yang sudah lewat & Tambah pipa baru
+        if (pipes.length > 0 && pipes[0].x < -40) pipes.shift();
+        if (Date.now() % 1500 < 20 && (pipes.length === 0 || pipes[pipes.length-1].x < 150)) {
+            pipes.push({ x: 300, h: Math.random() * 200 + 50 });
+        }
+
+        // Cek Jatuh
+        if (birdY > 400 || birdY < 0) endGame();
+
+        if (gameRunning) requestAnimationFrame(drawFly);
+    }
+
+    function endGame() {
+        gameRunning = false;
+        gameOverUI.style.display = 'block';
+    }
+    
+    // Kontrol Terbang
+    const flap = () => { if(gameRunning) birdV = jump; };
+    canvas.addEventListener('mousedown', flap);
+    canvas.addEventListener('touchstart', (e) => { flap(); e.preventDefault(); }, {passive: false});
+    
+</script>
+</body>
+</html>

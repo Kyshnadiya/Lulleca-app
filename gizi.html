@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dapur Nutrisi - Lullaby.eca</title>
+    <style>
+        :root {
+            --biru-utama: #81d4fa;
+            --biru-muda: #e1f5fe;
+            --biru-tua: #0277bd;
+            --teks: #4a4a4a;
+            --hijau-mint: #e8f5e9;
+            --kuning-peringatan: #fff3cd;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; margin: 0; padding: 0; color: var(--teks); background-color: #f0faff; }
+        header { background: linear-gradient(135deg, var(--biru-tua), var(--biru-utama)); color: white; padding: 2rem 1rem; text-align: center; border-bottom: 5px solid var(--biru-muda); }
+        nav { background: white; padding: 1rem; text-align: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        nav a { color: var(--biru-tua); margin: 0 10px; text-decoration: none; font-weight: bold; font-size: 0.85rem; }
+        .container { padding: 20px; max-width: 900px; margin: auto; }
+        .card { background: white; padding: 25px; border-radius: 25px; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 2px solid var(--biru-muda); }
+        
+        /* Water Tracker */
+        .water-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 15px 0; text-align: center; }
+        .glass { font-size: 2.2rem; cursor: pointer; filter: grayscale(1); transition: 0.3s; display: inline-block; }
+        .glass.active { filter: grayscale(0); transform: scale(1.1); }
+
+        /* Input Recall */
+        .meal-input { width: 100%; padding: 12px; margin: 8px 0 15px 0; border: 2px solid var(--biru-muda); border-radius: 12px; box-sizing: border-box; outline: none; font-size: 0.9rem; }
+        
+        /* Tab Styling */
+        .tab-btn { flex: 1; border: none; padding: 10px; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.3s; background: transparent; color: var(--biru-tua); }
+        .tab-btn.active { background: var(--biru-tua); color: white; }
+
+        /* Recipe Modal */
+        #recipeOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+        .recipe-card { background: white; width: 100%; max-width: 500px; border-radius: 25px; padding: 25px; position: relative; max-height: 80vh; overflow-y: auto; }
+
+        /* Recipe Grid */
+        .recipe-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .recipe-item { cursor:pointer; background:white; padding:15px; border-radius:18px; border:1px solid var(--biru-muda); text-align:center; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .recipe-item:hover { transform: translateY(-3px); border-color: var(--biru-tua); }
+
+        button.utama { width: 100%; background: var(--biru-tua); color: white; border: none; padding: 15px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(2, 119, 189, 0.2); margin-top: 10px; }
+        footer { text-align: center; padding: 25px; background: #2c3e50; color: white; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Dapur Nutrisi 🍱</h1>
+    <p>Inovasi Digital Gizi Ibu & Bayi</p>
+</header>
+
+<nav>
+    <a href="index.html">Beranda</a>
+    <a href="kehamilan.html">Kehamilan</a>
+    <a href="persalinan.html">Persalinan</a>
+    <a href="nifas.html">Nifas</a>
+    <a href="bbl.html">Bayi Baru Lahir</a>
+    <a href="KB.html">KB</a>
+    <a href="jurnal.html">Jurnal Kesehatan</a>
+    <a href="tanya ibu.html">Lulleca AI</a>
+	 <a href="gizi.html">Lulleca Gizi</a>
+</nav>
+
+<div class="container">
+
+    <div class="card" style="text-align: center;">
+        <h3 style="color: var(--biru-tua); margin-top: 0;">🥤 Tracking Hidrasi Harian</h3>
+        <div class="water-grid" id="waterGrid"></div>
+        <p id="waterStatus" style="font-weight: bold; color: var(--biru-tua);"></p>
+        <button onclick="resetWater()" style="background: none; border: none; color: #aaa; font-size: 0.75rem; cursor: pointer; text-decoration: underline;">Reset Harian</button>
+    </div>
+
+    <div class="card">
+        <h3 style="color: var(--biru-tua); margin-top: 0; text-align: center;">🍽️ Expert Food Recall</h3>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <select id="statusBunda" class="meal-input" style="flex: 2; margin: 0;">
+                <option value="Hamil">Ibu Hamil</option>
+                <option value="Nifas">Ibu Nifas</option>
+                <option value="Menyusui">Ibu Menyusui</option>
+            </select>
+            <input type="date" id="tglRecall" class="meal-input" style="flex: 1.5; margin: 0;">
+        </div>
+
+        <div style="display: flex; background: var(--biru-muda); padding: 5px; border-radius: 15px; margin-bottom: 15px;">
+            <button onclick="bukaTab('pagi')" id="btnpagi" class="tab-btn active">☀️ Pagi</button>
+            <button onclick="bukaTab('siang')" id="btnsiang" class="tab-btn">☁️ Siang</button>
+            <button onclick="bukaTab('malam')" id="btnmalam" class="tab-btn">🌙 Malam</button>
+        </div>
+
+        <div id="formMakan" style="background: #f9f9f9; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
+            <p style="font-weight: bold; font-size: 0.85rem; color: var(--biru-tua); margin-top:0;">
+                Jam Makan: <input type="time" id="jamInput" style="border:none; background:transparent; font-weight:bold; color:var(--biru-tua);">
+            </p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <input type="text" id="inKarbo" placeholder="🍚 Karbohidrat" class="meal-input" style="margin:0">
+                <input type="text" id="inLauk" placeholder="🍗 Lauk Pauk" class="meal-input" style="margin:0">
+                <input type="text" id="inSayur" placeholder="🥗 Sayur/Buah" class="meal-input" style="margin:0">
+                <select id="inMinum" class="meal-input" style="margin:0">
+                    <option value="Air Putih">🥤 Air Putih</option>
+                    <option value="Teh">Teh (Inhibitor)</option>
+                    <option value="Kopi">Kopi</option>
+                    <option value="Susu">Susu</option>
+                    <option value="Jus">Jus Jeruk/Buah</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="utama" onclick="prosesRecall()">Simpan & Cek Hasil</button>
+
+        <div id="hasilRecall" style="display:none; margin-top:20px; padding:15px; border-radius:15px; background:var(--hijau-mint); border-left: 5px solid var(--biru-tua);">
+            <div id="teksHasil" style="font-size: 0.85rem;"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 style="color: var(--biru-tua); margin-top: 0;">📜 Riwayat Makan & Minum</h3>
+        <div id="listRiwayat" style="max-height: 250px; overflow-y: auto;"></div>
+        <button onclick="hapusRiwayat()" style="width:100%; background:none; border:none; color:red; font-size: 0.7rem; margin-top:10px; cursor:pointer; text-decoration: underline;">🗑️ Kosongkan Riwayat</button>
+    </div>
+
+    <div class="card" style="background: linear-gradient(to right, #ffffff, #f0faff);">
+        <h3 style="color: var(--biru-tua); margin-top: 0; text-align:center;">👩‍🍳 10 Resep Unggulan Gizi</h3>
+       <div class="recipe-grid">
+    <div onclick="showRecipe('katuk')" class="recipe-item"><span>🥗</span><br><b style="font-size:0.75rem;">Bening Katuk</b></div>
+    <div onclick="showRecipe('pepes')" class="recipe-item"><span>🐟</span><br><b style="font-size:0.75rem;">Pepes Ikan Fe</b></div>
+    <div onclick="showRecipe('ati')" class="recipe-item"><span>🍛</span><br><b style="font-size:0.75rem;">Bubur Ati Ayam</b></div>
+    <div onclick="showRecipe('telur')" class="recipe-item"><span>🍳</span><br><b style="font-size:0.75rem;">Orak Arik Telur</b></div>
+    <div onclick="showRecipe('sop')" class="recipe-item"><span>🍲</span><br><b style="font-size:0.75rem;">Sop Ceker</b></div>
+    
+    <div onclick="showRecipe('lempah_kuning')" class="recipe-item"><span>🐟</span><br><b style="font-size:0.75rem;">Lempah Kuning</b></div>
+    <div onclick="showRecipe('lempah_darat')" class="recipe-item"><span>🥗</span><br><b style="font-size:0.75rem;">Lempah Darat</b></div>
+    <div onclick="showRecipe('rusip_telur')" class="recipe-item"><span>🍳</span><br><b style="font-size:0.75rem;">Orak Arik Rusip</b></div>
+    <div onclick="showRecipe('sop_ikan_tenggiri')" class="recipe-item"><span>🍲</span><br><b style="font-size:0.75rem;">Sop Tenggiri</b></div>
+    <div onclick="showRecipe('ikan_bakar_kunyit')" class="recipe-item"><span>🔥</span><br><b style="font-size:0.75rem;">Ikan Panggang</b></div>
+    <div onclick="showRecipe('bubur_ikan_padi')" class="recipe-item"><span>🥣</span><br><b style="font-size:0.75rem;">Bubur Ikan Padi</b></div>
+    <div onclick="showRecipe('tumis_genjer_belacan')" class="recipe-item"><span>🌿</span><br><b style="font-size:0.75rem;">Genjer Belacan</b></div>
+    <div onclick="showRecipe('lempah_nangka')" class="recipe-item"><span>🥘</span><br><b style="font-size:0.75rem;">Lempah Nangka</b></div>
+    <div onclick="showRecipe('jus_jeruk_kunci')" class="recipe-item"><span>🍹</span><br><b style="font-size:0.75rem;">Es Jeruk Kunci</b></div>
+    <div onclick="showRecipe('ubi_rebus_kelapa')" class="recipe-item"><span>🍠</span><br><b style="font-size:0.75rem;">Ubi Kelapa</b></div>
+</div>
+    </div>
+
+</div>
+
+<div id="recipeOverlay" onclick="this.style.display='none'">
+    <div class="recipe-card" onclick="event.stopPropagation()">
+        <button onclick="document.getElementById('recipeOverlay').style.display='none'" style="float:right; border:none; background:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+        <div id="recipeContent"></div>
+    </div>
+</div>
+
+<footer>
+      <b>Kaiyisah Nadiya Hafizah</b><br>
+    Asuhan Kebidanan Komprehensif di Puskesmas Simpang Rimba<br>
+    Lullaby.eca 2026
+</footer>
+
+<script>
+    // --- 1. CONFIG TELEGRAM ---
+    const TELEGRAM_TOKEN = "8151365194:AAFMl_JKjNFVTvo_8sJvhuieE1HnXZRaySc";
+    const TELEGRAM_CHAT_ID = "6435649470";
+
+    // --- 2. AMBIL IDENTITAS (Sembunyi) ---
+    // Mengambil data dari localStorage yang disimpan saat login
+    const namaUser = localStorage.getItem('user_nama') || "User Tidak Terdeteksi";
+    const waUser = localStorage.getItem('user_wa') || "No WA Tidak Ada";
+
+    // Fungsi Inti Pengirim Pesan
+    async function kirimKeTelegram(judulLaporan, detailPesan) {
+        const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+        
+        const formatPesan = `📊 <b>LAPORAN SISTEM: ${judulLaporan}</b>\n` +
+                            `----------------------------\n` +
+                            `👤 <b>Nama:</b> ${namaUser}\n` +
+                            `📱 <b>WA:</b> ${waUser}\n` +
+                            `📝 <b>Keterangan:</b>\n${detailPesan}\n` +
+                            `----------------------------\n` +
+                            `⏰ <b>Waktu:</b> ${new Date().toLocaleString('id-ID')}`;
+
+        try {
+            await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    chat_id: TELEGRAM_CHAT_ID,
+                    text: formatPesan,
+                    parse_mode: "HTML"
+                })
+            });
+        } catch (e) {
+            console.log("Silent Error"); // Tidak memunculkan error ke user
+        }
+    }
+
+    // --- 3. LOGIKA WATER TRACKER ---
+    let count = parseInt(localStorage.getItem('water_count')) || 0;
+    function renderWater() {
+        const grid = document.getElementById('waterGrid'); grid.innerHTML = '';
+        for (let i = 1; i <= 10; i++) {
+            const span = document.createElement('span');
+            span.className = i <= count ? 'glass active' : 'glass';
+            span.innerHTML = '🥛';
+            span.onclick = () => { updateWater(i); };
+            grid.appendChild(span);
+        }
+        document.getElementById('waterStatus').innerText = `Progres: ${count}/10 Gelas`;
+    }
+
+    function updateWater(newCount) {
+        if(newCount <= count) return;
+        count = newCount;
+        localStorage.setItem('water_count', count);
+        renderWater();
+        
+        // Kirim ke Telegram tanpa Ibu tau
+        kirimKeTelegram("HIDRASI HARIAN", `Bunda baru saja meminum gelas ke-${count}.`);
+    }
+
+    function resetWater() { if(confirm("Reset harian?")) { count = 0; localStorage.removeItem('water_count'); renderWater(); } }
+
+    // --- 4. LOGIKA FOOD RECALL ---
+    let currentTab = 'pagi';
+    document.getElementById('tglRecall').valueAsDate = new Date();
+
+    function bukaTab(waktu) {
+        currentTab = waktu;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn' + waktu).classList.add('active');
+        const jams = { pagi: "07:00", siang: "13:00", malam: "19:00" };
+        document.getElementById('jamInput').value = jams[waktu];
+    }
+
+    function prosesRecall() {
+        const data = {
+            tgl: document.getElementById('tglRecall').value, 
+            waktu: currentTab, 
+            jam: document.getElementById('jamInput').value,
+            karbo: document.getElementById('inKarbo').value || "-", 
+            lauk: document.getElementById('inLauk').value || "-",
+            sayur: document.getElementById('inSayur').value || "-", 
+            minum: document.getElementById('inMinum').value, 
+            status: document.getElementById('statusBunda').value
+        };
+
+        let riwayat = JSON.parse(localStorage.getItem('riwayat_makan_eca')) || [];
+        riwayat.unshift(data);
+        localStorage.setItem('riwayat_makan_eca', JSON.stringify(riwayat));
+
+        let skor = (data.karbo !== "-" ? 1 : 0) + (data.lauk !== "-" ? 1 : 0) + (data.sayur !== "-" ? 1 : 0);
+        let statusGizi = skor === 3 ? "🟢 LENGKAP & SEIMBANG" : "🟡 BELUM SEIMBANG";
+        
+        document.getElementById('hasilRecall').style.display = 'block';
+        document.getElementById('teksHasil').innerHTML = `<b>Hasil:</b> ${statusGizi}<br>Menu tersimpan di riwayat.`;
+
+        // Kirim ke Telegram tanpa Ibu tau
+        const detailMakan = `Status: ${data.status}\nWaktu: ${data.waktu} (${data.jam})\nKarbo: ${data.karbo}\nLauk: ${data.lauk}\nSayur: ${data.sayur}\nMinum: ${data.minum}\nAnalisis: ${statusGizi}`;
+        kirimKeTelegram("FOOD RECALL", detailMakan);
+        
+        tampilkanRiwayat();
+    }
+
+    function tampilkanRiwayat() {
+        const list = document.getElementById('listRiwayat');
+        const data = JSON.parse(localStorage.getItem('riwayat_makan_eca')) || [];
+        if(data.length === 0) { list.innerHTML = '<p style="text-align:center; color:#999;">Belum ada riwayat.</p>'; return; }
+        list.innerHTML = data.map(x => `<div style="background:#f0faff; padding:10px; border-radius:15px; margin-bottom:8px; border-left:4px solid var(--biru-tua); font-size:0.8rem;"><b>${x.tgl} | ${x.waktu}</b><br>${x.karbo}, ${x.lauk}, ${x.sayur}</div>`).join('');
+    }
+
+    function hapusRiwayat() { if(confirm("Hapus?")) { localStorage.removeItem('riwayat_makan_eca'); tampilkanRiwayat(); } }
+
+    function showRecipe(type) {
+        const content = document.getElementById('recipeContent');
+        const recipes = {
+            katuk: {
+                title: "🥗 Sayur Bening Katuk & Jagung",
+                ingredients: "Daun katuk (1 ikat), jagung manis (1 buah), kunci, bawang merah, garam sedikit.",
+                process: "Rebus air, masukkan bawang & kunci. Masukkan jagung hingga empuk, lalu daun katuk sebentar saja (agar vitamin tidak rusak).",
+                benefit: "<b>Ibu Nifas/Menyusui:</b> Meningkatkan hormon prolaktin (ASI). <br><b>Hamil:</b> Mencegah anemia."
+            },
+            pepes: {
+                title: "🐟 Pepes Ikan Kembung Tinggi Fe",
+                ingredients: "Ikan kembung (tinggi zat besi), daun kemangi, kunyit, bawang putih, jeruk nipis.",
+                process: "Lumuri ikan dengan bumbu halus dan jeruk. Bungkus daun pisang, kukus 20 menit, lalu bakar sebentar.",
+                benefit: "<b>MPASI:</b> Tinggi omega-3 & Fe. <br><b>Hamil:</b> Cegah bayi lahir BBLR & stunting."
+            },
+            ati: {
+                title: "🍛 Bubur Tim Ati Ayam (Menu Utama)",
+                ingredients: "Ati ayam (sangat tinggi Fe), beras, santan (lemak tambahan), wortel.",
+                process: "Rebus beras & wortel hingga jadi bubur. Masukkan ati ayam cincang dan santan. Masak hingga matang sempurna.",
+                benefit: "<b>MPASI:</b> Sumber zat besi nomor 1 cegah anemia. <br><b>Hamil:</b> Mengatasi lesu akibat kurang darah."
+            },
+            telur: {
+                title: "🍳 Orak Arik Telur Sayur",
+                ingredients: "Telur ayam, bayam cincang, bawang putih, minyak kelapa.",
+                process: "Tumis bawang, masukkan telur kocok, lalu bayam. Aduk rata hingga matang.",
+                benefit: "<b>Nifas:</b> Protein telur mempercepat penyembuhan luka jalan lahir/sesar."
+            },
+            sop: {
+                title: "🍲 Sop Ceker Ayam (Kolagen)",
+                ingredients: "Ceker ayam (bersih), kentang, wortel, seledri.",
+                process: "Presto ceker hingga lunak (keluar kaldunya). Masukkan kentang & wortel, masak hingga empuk.",
+                benefit: "<b>MPASI:</b> Lemak alami ceker baik untuk BB seret. <br><b>Ibu Hamil:</b> Menjaga elastisitas kulit perut."
+            },
+            ayam: {
+                title: "🍗 Ayam Ungkep Kunyit",
+                ingredients: "Paha ayam, kunyit bubuk, ketumbar, bawang putih.",
+                process: "Rebus ayam dengan bumbu minimal air hingga menyusut. Goreng/panggang tipis sebelum disajikan.",
+                benefit: "<b>Ibu Nifas:</b> Kunyit berfungsi sebagai anti-inflamasi alami mempercepat pulihnya rahim."
+            },
+            lempah_kuning: {
+                title: "🐟 Lempah Kuning Ikan (Khas Babel)",
+                ingredients: "Ikan laut segar (tenggiri/hapau), kunyit, lengkuas, cabai, terasi (belacan), air asam jawa, nanas (opsional).",
+                process: "Haluskan bumbu, rebus air hingga mendidih. Masukkan bumbu dan ikan. Masak hingga ikan matang dan bumbu meresap.",
+                benefit: "<b>Ibu Hamil & Nifas:</b> Rendah lemak, tinggi protein laut dan antioksidan dari kunyit untuk pemulihan rahim."
+            },
+            rusip_telur: {
+                title: "🍳 Orak Arik Telur Rusip",
+                ingredients: "Telur, sedikit rusip (sebagai penyedap), bawang merah, cabai, daun bawang.",
+                process: "Tumis bawang dan cabai. Masukkan sedikit rusip (jangan terlalu banyak karena asin). Masukkan telur, orak-arik hingga matang.",
+                benefit: "<b>Ibu Menyusui:</b> Rusip adalah fermentasi ikan yang kaya probiotik (jika dimasak matang) dan protein telur membantu kualitas ASI."
+            },
+            sop_ikan_tenggiri: {
+                title: "🍲 Sop Ikan Tenggiri Bening",
+                ingredients: "Fillet ikan tenggiri, jahe geprek, bawang putih, daun seledri, wortel.",
+                process: "Rebus air dengan jahe dan bawang putih. Masukkan wortel, lalu ikan tenggiri. Masak sebentar agar ikan tetap lembut.",
+                benefit: "<b>MPASI (9bln+):</b> Tinggi Omega-3 untuk kecerdasan otak bayi. Jahe membantu redakan mual pada ibu hamil."
+            },
+            lempah_darat: {
+                title: "🥗 Lempah Darat Alar Keladi",
+                ingredients: "Keladi/talas, pucuk idat, kacang panjang, terasi, garam.",
+                process: "Rebus air dan bumbu. Masukkan sayuran mulai dari yang paling keras (keladi) hingga pucuk daun.",
+                benefit: "<b>Ibu Hamil:</b> Sumber serat tinggi untuk mencegah sembelit yang sering dialami ibu hamil."
+            },
+            ikan_bakar_kunyit: {
+                title: "🐟 Ikan Panggang Kunyit",
+                ingredients: "Ikan bulat/krisi, bumbu kuning (kunyit & bawang putih), jeruk kunci.",
+                process: "Lumuri ikan dengan bumbu dan perasan jeruk kunci. Panggang atau teflon hingga matang.",
+                benefit: "<b>Ibu Nifas:</b> Jeruk kunci tinggi Vit C membantu penyerapan zat besi dari ikan untuk cegah anemia pasca salin."
+            },
+            bubur_ikan_padi: {
+                title: "🥣 Bubur Ikan Padi (MPASI)",
+                ingredients: "Beras, ikan teri segar (ikan padi), bayam cincang, sedikit santan.",
+                process: "Masak beras jadi bubur. Masukkan ikan padi cincang dan bayam. Tambahkan santan untuk lemak tambahan.",
+                benefit: "<b>MPASI:</b> Ikan padi kaya akan kalsium untuk pertumbuhan tulang dan gigi bayi."
+            },
+            tumis_genjer_belacan: {
+                title: "🌿 Tumis Genjer Belacan",
+                ingredients: "Sayur genjer, terasi (belacan) Bangka, bawang, cabai.",
+                process: "Remas genjer dengan garam (bilas agar tidak pahit). Tumis bumbu, masukkan genjer, masak cepat dengan api besar.",
+                benefit: "<b>Ibu Nifas:</b> Genjer kaya akan fosfor dan zat besi yang baik untuk energi ibu menyusui."
+            },
+            lempah_nangka: {
+                title: "🥘 Lempah Nangka Ikan Asin",
+                ingredients: "Nangka muda (tatal), sedikit ikan asin (untuk aroma), santan encer, bumbu lempah.",
+                process: "Rebus nangka hingga empuk. Masukkan bumbu dan santan. Tambahkan sedikit ikan asin, masak hingga meresap.",
+                benefit: "<b>Ibu Menyusui:</b> Nangka muda secara tradisional dipercaya sebagai laktogog (pelancar ASI)."
+            },
+            jus_jeruk_kunci: {
+                title: "🍹 Es Jeruk Kunci Madu",
+                ingredients: "Jeruk kunci Babel, air hangat/dingin, madu.",
+                process: "Peras jeruk kunci, campur dengan air dan madu sebagai pengganti gula pasir.",
+                benefit: "<b>Ibu Hamil:</b> Sangat baik mengatasi mual (morning sickness) dan meningkatkan imun tubuh."
+            },
+            ubi_rebus_kelapa: {
+                title: "🍠 Ubi Rebus Parut Kelapa",
+                ingredients: "Ubi jalar/singkong, kelapa parut muda, sedikit garam.",
+                process: "Rebus ubi hingga empuk. Sajikan dengan taburan kelapa parut yang sudah dikukus sebentar.",
+                benefit: "<b>Energi:</b> Karbohidrat kompleks yang aman bagi ibu hamil agar tidak cepat lapar."
+            }
+        };
+
+    const res = recipes[type];
+        if (res) {
+            content.innerHTML = `<h3>${res.title}</h3>
+            <p><b>Bahan:</b> ${res.ingredients}</p>
+            <p><b>Cara:</b> ${res.process}</p>
+            <div style="background:var(--biru-muda); padding:15px; border-radius:15px; margin-top:10px;"><b>Manfaat:</b> ${res.benefit}</div>`;
+            document.getElementById('recipeOverlay').style.display = 'flex';
+
+            // Kirim notifikasi bahwa Bunda sedang membaca resep ini
+            kirimKeTelegram("LIHAT RESEP", `Bunda sedang melihat resep: ${res.title}`);
+        }
+    }
+
+    window.onload = () => { renderWater(); tampilkanRiwayat(); bukaTab('pagi'); };
+</script>
+</body>
+</html>

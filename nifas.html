@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masa Nifas -  Lullaby.eca</title>
+    <style>
+        /* CSS DASAR & RESPONSIVE */
+        body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; margin: 0; padding: 0; color: #333; background-color: #f9f0ff; }
+        header { background: #8e44ad; color: white; padding: 1.5rem; text-align: center; }
+        
+        nav { background: #6d2191; padding: 0.8rem; text-align: center; position: sticky; top: 0; z-index: 1000; }
+        nav a { color: white; margin: 0 8px; text-decoration: none; font-weight: bold; font-size: 0.85rem; display: inline-block; }
+        
+        .container { padding: 15px; max-width: 900px; margin: auto; }
+        .card { border: none; padding: 20px; border-radius: 15px; margin-bottom: 20px; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h2 { color: #8e44ad; border-left: 5px solid #d187f5; padding-left: 10px; margin-top: 0; margin-bottom: 15px; font-size: 1.3rem; }
+        
+        /* Gaya Accordion (Bisa Dipencet) */
+        details { background: #fdfbff; border: 1px solid #f3e5f5; border-radius: 10px; margin-bottom: 10px; padding: 10px; transition: 0.3s; }
+        details summary { font-weight: bold; color: #8e44ad; cursor: pointer; outline: none; display: flex; align-items: center; }
+        details summary img { width: 25px; margin-right: 10px; }
+        details[open] { background: #fff; border: 1px solid #d187f5; }
+
+        /* Gaya Tabel agar Rapi di HP */
+        .table-wrapper { overflow-x: auto; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: white; }
+        th, td { border: 1px solid #f3e5f5; padding: 10px; text-align: left; }
+        th { background: #f3e5f5; color: #8e44ad; }
+
+        /* Grid System */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-top: 15px; }
+        .grid-item { text-align: center; padding: 15px; border: 1px solid #f3e5f5; border-radius: 12px; background: #fff; }
+        .grid-item img { width: 50px; height: 50px; margin-bottom: 10px; }
+        .grid-item b { display: block; color: #8e44ad; font-size: 0.85rem; }
+
+        .benefit-box { padding: 10px; border-radius: 10px; margin-top: 5px; font-size: 0.8rem; }
+        .baby { background: #fff0f6; border: 1px solid #ffdeeb; }
+        .mom { background: #f0f5ff; border: 1px solid #d6e4ff; }
+
+        footer { text-align: center; padding: 20px; background: #2c3e50; color: white; margin-top: 30px; font-size: 0.8rem; }
+
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.5rem; }
+            .grid-container { grid-template-columns: repeat(2, 1fr); }
+        }
+        /* Gaya Fitur Nifas */
+        .epds-option { margin-bottom: 10px; padding: 10px; background: #fdf2f8; border-radius: 8px; border: 1px solid #f9a8d4; }
+        .epds-option select { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #f472b6; }
+        .btn-check { background: #8e44ad; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .res-nifas { display: none; margin-top: 15px; padding: 15px; border-radius: 10px; font-size: 0.85rem; line-height: 1.4; }
+        .res-danger { background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
+        .res-safe { background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Masa Nifas & Menyusui</h1>
+    <p>Pemulihan Ibu dan Nutrisi Terbaik untuk Bayi</p>
+</header>
+<nav>
+    <a href="index.html">Beranda</a>
+    <a href="kehamilan.html">Kehamilan</a>
+    <a href="persalinan.html">Persalinan</a>
+    <a href="nifas.html">Nifas</a>
+    <a href="bbl.html">Bayi Baru Lahir</a>
+    <a href="KB.html">KB</a>
+    <a href="jurnal.html">Jurnal Kesehatan</a>
+    <a href="tanya ibu.html">Lulleca AI</a>
+	 <a href="gizi.html">Lulleca Gizi</a>
+</nav>
+
+<div class="container">
+
+<div class="card" style="border: 2px solid #8e44ad;">
+        <h2>🗓️ Kalkulator Jadwal Kunjungan</h2>
+        <p style="font-size: 0.85rem;">Input data persalinan untuk melihat jadwal KF & KN:</p>
+        
+        <label style="font-size: 0.85rem; font-weight: bold;">Tanggal & Jam Persalinan:</label>
+        <input type="datetime-local" id="tglLahir" style="width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #8e44ad; border-radius: 5px; box-sizing: border-box;">
+        
+        <label style="font-size: 0.85rem; font-weight: bold;">Usia Kehamilan (Minggu):</label>
+        <input type="number" id="ukLahir" placeholder="Contoh: 39" style="width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #8e44ad; border-radius: 5px; box-sizing: border-box;">
+        
+        <button class="btn-check" onclick="hitungJadwalNifas()">Buat Jadwal Kunjungan</button>
+        
+        <div id="hasilJadwal" class="res-nifas" style="background: #fdfbff; color: #333; border: 1px solid #d187f5;">
+            </div>
+    </div>
+
+    <div class="card">
+        <h2>Perubahan Masa Nifas</h2>
+        <p style="font-size: 0.85rem; color: #666;">Klik bagian di bawah untuk melihat detail:</p>
+        
+        <details>
+           <summary><img src="https://cdn-icons-png.flaticon.com/128/818/818872.png"> Perubahan Fisik (Uterus)</summary>
+            <div class="table-wrapper">
+                <table>
+                    <tr><th>Waktu Involusi</th><th>Tinggi Fundus Uteri (TFU)</th><th>Berat Uterus</th></tr>
+                    <tr><td>Bayi Lahir</td><td>Setinggi Pusat</td><td>1000 gr</td></tr>
+                    <tr><td>1 Minggu</td><td>Pertengahan Pusat - Simfisis</td><td>500 gr</td></tr>
+                    <tr><td>2 Minggu</td><td>Tidak teraba di atas Simfisis</td><td>350 gr</td></tr>
+                    <tr><td>6 Minggu</td><td>Ukuran Normal</td><td>50 gr</td></tr>
+                </table>
+            </div>
+        </details>
+
+        <details>
+            <summary><img src="lochea_nifas.PNG"> Jenis-Jenis Lokia (Cairan Nifas)</summary>
+            <div class="table-wrapper">
+                <table>
+                    <tr><th>Lokia</th><th>Waktu</th><th>Warna & Ciri</th></tr>
+                    <tr><td>Rubra</td><td>1-3 Hari</td><td>Merah Segar (Darah, sisa selaput ketuban)</td></tr>
+                    <tr><td>Sanguinolenta</td><td>3-7 Hari</td><td>Merah Kecokelatan (Berlendir)</td></tr>
+                    <tr><td>Serosa</td><td>7-14 Hari</td><td>Kuning/Kecokelatan (Cairan serum)</td></tr>
+                    <tr><td>Alba</td><td>>14 Hari</td><td>Putih (Leukosit dan sel epitel)</td></tr>
+                </table>
+            </div>
+        </details>
+
+        <details>
+            <summary><img src="psikologis_nifas.PNG"> Perubahan Psikologis Ibu</summary>
+            <div class="table-wrapper">
+                <table>
+                    <tr><th>Fase</th><th>Waktu</th><th>Ciri-Ciri</th></tr>
+                    <tr><td>Taking In</td><td>1-2 Hari</td><td>Ibu fokus pada diri sendiri, butuh makan dan tidur.</td></tr>
+                    <tr><td>Taking Hold</td><td>3-10 Hari</td><td>Ibu mulai belajar merawat bayi (sangat sensitif).</td></tr>
+                    <tr><td>Letting Go</td><td>>10 Hari</td><td>Menerima tanggung jawab penuh sebagai ibu.</td></tr>
+                </table>
+            </div>
+        </details>
+    </div>
+
+    <div class="card">
+        <h2>Kebutuhan Nutrisi Ibu Nifas</h2>
+        <div class="grid-container">
+            <div class="grid-item">
+                <img src="vegetable_nifas.PNG">
+                <b>Sayuran Hijau</b>
+                <p>Daun katuk, bayam & brokoli untuk produksi ASI.</p>
+            </div>
+            <div class="grid-item">
+                <img src="daging_nifas.PNG">
+                <b>Protein Tinggi</b>
+                <p>Telur, ikan, & daging untuk penyembuhan luka.</p>
+            </div>
+            <div class="grid-item">
+                <img src="fluid_nifas.PNG">
+                <b>Cairan</b>
+                <p>Minum minimal 3 liter/hari agar tidak dehidrasi.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Teknik Pelekatan Menyusui</h2>
+        <div style="text-align: center; background: #fff5f8; padding: 15px; border-radius: 12px;">
+            <img src="AMUBIDA.JPG" style="width: 120px; margin-bottom: 10px;">
+            <p style="font-size: 0.9rem; font-weight: bold; color: #8e44ad;">Tanda Pelekatan yang Benar (AMUBIDA):</p>
+        </div>
+        <details style="margin-top: 15px;">
+            <summary>Klik untuk Langkah Pelekatan</summary>
+            <ul style="font-size: 0.85rem; color: #555;">
+                <li><b>A:</b> Areola (sebagian besar masuk ke mulut bayi).</li>
+                <li><b>MU:</b> Mulut terbuka lebar.</li>
+                <li><b>BI:</b> Bibir bawah bayi terputar ke luar.</li>
+                <li><b>DA:</b> Dagu menempel pada payudara ibu.</li>
+            </ul>
+        </details>
+    </div>
+
+    <div class="card">
+        <h2>Manfaat Luar Biasa ASI</h2>
+        <div class="grid-container">
+            <div class="benefit-box baby">
+                <b>👶 Untuk Bayi</b>
+                <p>Nutrisi lengkap, antibodi alami, IQ lebih tinggi, & cegah stunting.</p>
+            </div>
+            <div class="benefit-box mom">
+                <b>👩 Untuk Ibu</b>
+                <p>Rahim cepat pulih, KB alami (MAL), berat badan turun, & hemat biaya!</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card danger-card">
+        <h2>Waspada Tanda Bahaya!</h2>
+        <div class="grid-container">
+            <div class="grid-item"><img src="bleeding_kehamilan.PNG"><p>Perdarahan</p></div>
+            <div class="grid-item"><img src="fever.PNG"><p>Demam >38°C</p></div>
+            <div class="grid-item"><img src="pain.PNG"><p>Sakit Kepala</p></div>
+            <div class="grid-item"><img src="smell.PNG"><p>Lokia Berbau</p></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Skrining Mandiri Ibu Nifas</h2>
+        <p style="font-size: 0.8rem; color: #666;">Silakan isi poin di bawah ini berdasarkan kondisi Ibu saat ini:</p>
+        <div class="table-wrapper">
+            <table id="tableNifas">
+                <tr><th>Kondisi</th><th>Ya</th><th>Tidak</th></tr>
+                <tr><td>Sakit kepala/Pandangan kabur/Nyeri ulu hati</td><td><input type="radio" name="n1" value="ya"></td><td><input type="radio" name="n1" value="tidak" checked></td></tr>
+                <tr><td>Demam (Suhu > 38°C) / Jantung berdebar</td><td><input type="radio" name="n2" value="ya"></td><td><input type="radio" name="n2" value="tidak" checked></td></tr>
+                <tr><td>Cairan jalan lahir berbau/Nyeri perut bawah</td><td><input type="radio" name="n3" value="ya"></td><td><input type="radio" name="n3" value="tidak" checked></td></tr>
+                <tr><td>Pembalut basah < 5 menit (Perdarahan hebat)</td><td><input type="radio" name="n4" value="ya"></td><td><input type="radio" name="n4" value="tidak" checked></td></tr>
+                <tr><td>Payudara bengkak, merah, & sangat nyeri</td><td><input type="radio" name="n5" value="ya"></td><td><input type="radio" name="n5" value="tidak" checked></td></tr>
+                <tr><td>Gangguan BAK (Nyeri/Panas/Tidak bisa BAK)</td><td><input type="radio" name="n6" value="ya"></td><td><input type="radio" name="n6" value="tidak" checked></td></tr>
+                <tr><td>Gangguan napas (Sesak/Nyeri dada/Batuk >2 minggu)</td><td><input type="radio" name="n7" value="ya"></td><td><input type="radio" name="n7" value="tidak" checked></td></tr>
+            </table>
+        </div>
+        <button class="btn-check" onclick="cekKondisiNifas()">Cek Kesimpulan Kondisi</button>
+        <div id="hasilNifas" class="res-nifas"></div>
+    </div>
+
+    <div class="card" style="border-top: 5px solid #f472b6;">
+        <h2>Skrining EPDS (Kesehatan Jiwa)</h2>
+        <p style="font-size: 0.8rem; color: #666;">Pilihlah jawaban yang paling menggambarkan perasaan Ibu dalam 7 hari terakhir.</p>
+        
+        <div class="epds-option">
+            <label>1. Saya mampu tertawa dan melihat sisi lucu dari berbagai hal:</label>
+            <select id="e1"><option value="0">Sama seperti biasanya</option><option value="1">Tidak terlalu sering</option><option value="2">Sudah pasti tidak terlalu sering</option><option value="3">Tidak bisa sama sekali</option></select>
+        </div>
+        <div class="epds-option">
+            <label>2. Saya menantikan berbagai hal dengan rasa senang:</label>
+            <select id="e2"><option value="0">Sama seperti biasanya</option><option value="1">Kurang dari biasanya</option><option value="2">Sangat kurang dari biasanya</option><option value="3">Tidak bisa sama sekali</option></select>
+        </div>
+        <div class="epds-option">
+            <label>3. Saya menyalahkan diri sendiri saat terjadi kesalahan:</label>
+            <select id="e3"><option value="3">Ya, hampir setiap waktu</option><option value="2">Ya, beberapa kali</option><option value="1">Tidak terlalu sering</option><option value="0">Tidak pernah</option></select>
+        </div>
+        <div class="epds-option">
+            <label>4. Saya merasa cemas dan khawatir tanpa alasan yang jelas:</label>
+            <select id="e4"><option value="0">Tidak pernah</option><option value="1">Hampir tidak pernah</option><option value="2">Ya, terkadang</option><option value="3">Ya, sangat sering</option></select>
+        </div>
+        <div class="epds-option">
+            <label>5. Saya merasa takut atau panik tanpa alasan yang kuat:</label>
+            <select id="e5"><option value="3">Ya, sangat sering</option><option value="2">Ya, terkadang</option><option value="1">Tidak terlalu sering</option><option value="0">Tidak pernah</option></select>
+        </div>
+        <div class="epds-option">
+            <label>6. Saya merasa sedih atau tidak bahagia:</label>
+            <select id="e6"><option value="3">Ya, hampir setiap waktu</option><option value="2">Ya, cukup sering</option><option value="1">Tidak terlalu sering</option><option value="0">Tidak pernah</option></select>
+        </div>
+
+        <button class="btn-check" style="background: #f472b6;" onclick="hitungEPDS()">Lihat Skor Kesehatan Jiwa</button>
+        <div id="hasilEPDS" class="res-nifas"></div>
+    </div>
+
+    <div class="card">
+        <h2>Jadwal Kunjungan (KN)</h2>
+        <div class="grid-container">
+            <div class="grid-item">
+                <b>KF 1</b>
+                <p>6 - 48 Jam</p>
+                <p>Mencegah terjadinya pendarahan pascapersalinan, memberikan panduan awal ASI, Mencegah hipotermia pada bayi</p>
+            </div>
+            <div class="grid-item">
+                <b>KF 2</b>
+                <p>Hari 3 - 7</p>
+                <p>Memeriksa involusi uterus, evaluasi adanya tanda infeksi, memastikan nutrisi ibu, memberikan konseling perawatan tali pusat menjaga suhu bayi</p>
+            </div>
+            <div class="grid-item">
+                <b>KF 3</b>
+                <p>Hari 8 - 28</p>
+                <p>Memantau Proses involusi uterus, evaluasi kesehatan ibu, konseling perawatan bayi menyusui dan perasaan ibu, memastikan nutrisi dan istirahat, konseling KB, memantau perkembangan bayi</p>
+            </div>
+             <div class="grid-item">
+                <b>KF 4</b>
+                <p>Hari 29 - 42</p>
+                <p>Pemeriksaan keadaan ibu dan bayi, konseling KB, Edukasi mengenai posyandu dan pemeriksaan rutin</p>
+             </div>
+        </div>
+    </div>
+
+</div>
+
+<footer>
+    <b>Kaiyisah Nadiya Hafizah</b><br>
+    Asuhan Kebidanan Komprehensif di Puskesmas Simpang Rimba<br>
+    Lullaby.eca 2026
+</footer>
+
+<script>
+    // 1. KONFIGURASI TELEGRAM
+    const TELEGRAM_TOKEN = "8151365194:AAFMl_JKjNFVTvo_8sJvhuieE1HnXZRaySc";
+    const TELEGRAM_CHAT_ID = "6435649470";
+
+    // 2. AMBIL DATA IDENTITAS LOGIN
+    const namaUser = localStorage.getItem('user_nama') || "Bunda Tanpa Nama";
+    const waUser = localStorage.getItem('user_wa') || "Tidak ada No WA";
+
+    // 3. FUNGSI KIRIM LAPORAN (FORMAT SESUAI PERMINTAAN)
+    function kirimLaporan(teksDetail) {
+        const pesanLengkap = `✅ <b>LAPORAN NIFAS LULLABY.ECA</b>\n` +
+                             `----------------------------\n` +
+                             `👤 <b>Nama:</b> ${namaUser}\n` +
+                             `📱 <b>WA:</b> ${waUser}\n` +
+                             `📝 <b>Keterangan:</b>\n${teksDetail}\n` +
+                             `⏰ <b>Waktu:</b> ${new Date().toLocaleString('id-ID')}\n` +
+                             `----------------------------`;
+
+        const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(pesanLengkap)}&parse_mode=html`;
+        
+        fetch(url)
+            .then(res => console.log("Laporan Terkirim!"))
+            .catch(err => console.error("Gagal kirim ke Telegram:", err));
+    }
+
+    // 4. CEK KONDISI FISIK NIFAS
+    function cekKondisiNifas() {
+        let yaCount = 0;
+        let ringkasan = "";
+        
+        document.querySelectorAll('#tableNifas tr').forEach((row, index) => {
+            if(index > 0) { 
+                let label = row.cells[0].innerText;
+                let inputYa = row.querySelector('input[value="ya"]');
+                if(inputYa && inputYa.checked) {
+                    yaCount++;
+                    ringkasan += `- ${label}\n`;
+                }
+            }
+        });
+
+        let res = document.getElementById('hasilNifas');
+        res.style.display = "block";
+        
+        if(yaCount >= 1) {
+            res.className = "res-nifas res-danger";
+            res.innerHTML = "<b>KESIMPULAN:</b><br>⚠️ Segera hubungi Bidan atau bawa Ibu ke Puskesmas/RS! Ditemukan tanda bahaya pada kondisi fisik Ibu.";
+            kirimLaporan(`🚨 <b>TANDA BAHAYA NIFAS!</b>\nGejala:\n${ringkasan}\n<b>Status: BAHAYA</b>`);
+        } else {
+            res.className = "res-nifas res-safe";
+            res.innerHTML = "<b>KESIMPULAN:</b><br>✅ Kondisi fisik Ibu terpantau normal. Tetap istirahat cukup dan jaga nutrisi.";
+            kirimLaporan(`✅ <b>SKRINING FISIK NORMAL</b>\nIbu melaporkan tidak ada keluhan fisik.`);
+        }
+    }
+
+    // 5. SKRINING JIWA (EPDS)
+    function hitungEPDS() {
+        let total = 0;
+        for(let i=1; i<=6; i++) { total += parseInt(document.getElementById('e'+i).value); }
+        let res = document.getElementById('hasilEPDS');
+        res.style.display = "block";
+        
+        let status = "";
+        if(total >= 8) {
+            res.className = "res-nifas res-danger";
+            res.innerHTML = `<b>Skor EPDS: ${total}</b><br>⚠️ Ibu terindikasi mengalami tekanan psikologis/Postpartum Blues.`;
+            status = "⚠️ RISIKO DEPRESI/BLUES";
+        } else {
+            res.className = "res-nifas res-safe";
+            res.innerHTML = `<b>Skor EPDS: ${total}</b><br>✅ Kesehatan jiwa Ibu terpantau baik.`;
+            status = "✅ JIWA NORMAL";
+        }
+        
+        kirimLaporan(`🧠 <b>SKRINING JIWA (EPDS)</b>\nSkor Total: ${total}\nStatus: ${status}`);
+    }
+    
+    // 6. HITUNG JADWAL KUNJUNGAN
+    function hitungJadwalNifas() {
+        const tglInput = document.getElementById('tglLahir').value;
+
+        if (!tglInput) {
+            alert("Silakan pilih tanggal persalinan!");
+            return;
+        }
+
+        const tglLahir = new Date(tglInput);
+        const formatTgl = (d, tambahHari) => {
+            let baru = new Date(d);
+            baru.setDate(d.getDate() + tambahHari);
+            return baru.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+        };
+
+        const kf1 = formatTgl(tglLahir, 0);
+        const kf2 = formatTgl(tglLahir, 3);
+        const kf4 = formatTgl(tglLahir, 29);
+
+        const res = document.getElementById('hasilJadwal');
+        res.style.display = "block";
+        res.innerHTML = `
+            <b style="color: #8e44ad;">📍 JADWAL KUNJUNGAN IBU & BAYI:</b><br>
+            <hr style="border: 0.5px solid #eee; margin: 10px 0;">
+            <b>KF 1 & KN 1:</b> ${kf1}<br>
+            <b>KF 4:</b> ${kf4}
+        `;
+
+        kirimLaporan(`📅 <b>CEK JADWAL KUNJUNGAN</b>\nPersalinan: ${tglInput}\nEstimasi KF1: ${kf1}\nEstimasi KF4: ${kf4}`);
+    }
+</script>
+</body>
+</html>

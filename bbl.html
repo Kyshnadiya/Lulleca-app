@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bayi Baru Lahir -  Lullaby.eca</title>
+    <style>
+        :root {
+            --butter-yellow: #f9e27d;
+            --soft-cream: #fffdf0;
+            --brown-text: #5d4037;
+            --accent-yellow: #f0d45a;
+            --danger-red: #e53935;
+            --safe-green: #43a047;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            line-height: 1.6; 
+            margin: 0; 
+            padding: 0; 
+            color: var(--brown-text); 
+            background-color: var(--soft-cream); 
+        }
+
+        header { 
+            background: var(--butter-yellow); 
+            padding: 2rem 1rem; 
+            text-align: center; 
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        header h1 { margin: 0; font-size: 1.8rem; color: #856404; }
+        header p { margin: 5px 0 0; font-style: italic; opacity: 0.8; }
+
+        nav { 
+            background: var(--accent-yellow); 
+            padding: 10px; 
+            text-align: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        nav a { 
+            color: var(--brown-text); 
+            margin: 5px 10px; 
+            text-decoration: none; 
+            font-weight: bold; 
+            font-size: 0.85rem; 
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            transition: 0.3s;
+        }
+
+        nav a:hover { background: white; }
+
+        .container { padding: 20px; max-width: 900px; margin: auto; }
+
+        /* Card Styling */
+        .card { 
+            background: white; 
+            border-radius: 20px; 
+            padding: 20px; 
+            margin-bottom: 25px; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            border: 1px solid #fff9c4;
+        }
+
+        h2 { 
+            color: #856404; 
+            font-size: 1.4rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px;
+            margin-top: 0;
+        }
+
+        /* Icon Grid */
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .icon-item {
+            text-align: center;
+            padding: 15px;
+            background: #fffef2;
+            border-radius: 15px;
+            border: 1px solid #fff59d;
+            transition: transform 0.3s;
+        }
+
+        .icon-item:hover { transform: translateY(-5px); }
+        .icon-item img { width: 50px; height: 50px; margin-bottom: 10px; }
+        .icon-item b { font-size: 0.85rem; display: block; margin-bottom: 5px; color: #5d4037; }
+        .icon-item p { font-size: 0.75rem; margin: 0; color: #795548; }
+
+        /* Step Styling */
+        .step-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            background: #fffdf0;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border-left: 5px solid var(--accent-yellow);
+        }
+        .step-number {
+            background: var(--accent-yellow);
+            color: #856404;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* KN Schedule */
+        .kn-timeline {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            text-align: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .kn-box {
+            background: #fdfae6;
+            padding: 10px;
+            border-radius: 10px;
+            flex: 1;
+            min-width: 80px;
+            border: 1px solid #ffe082;
+        }
+        .kn-box b { color: #f57f17; font-size: 0.9rem; }
+
+        /* Log Section */
+        .log-container { background: #fffde7; padding: 15px; border-radius: 15px; border: 2px dashed #fbc02d; }
+        .log-btn-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        .btn-log { flex: 1; padding: 15px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; box-shadow: 0 4px 0 rgba(0,0,0,0.1); }
+        .btn-log:active { transform: translateY(2px); box-shadow: none; }
+        .btn-kiri { background: #4a90e2; }
+        .btn-kanan { background: #e91e63; }
+        
+        .log-list { list-style: none; padding: 0; font-size: 0.85rem; max-height: 180px; overflow-y: auto; }
+        .log-item { background: white; padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 5px solid #fbc02d; display: flex; justify-content: space-between; }
+
+        /* Table Responsive */
+        .table-wrapper { overflow-x: auto; border-radius: 15px; border: 1px solid #fff59d; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; background: white; font-size: 0.85rem; }
+        th { background: #fef9c3; padding: 15px; text-align: left; color: #856404; }
+        td { padding: 12px; border-bottom: 1px solid #fffde7; }
+
+        .btn-check-bbl { background: #fbc02d; color: #5d4037; border: none; padding: 18px; border-radius: 15px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 1rem; box-shadow: 0 4px 0 #d4a017; }
+        .res-bbl { display: none; margin-top: 15px; padding: 20px; border-radius: 15px; font-size: 0.9rem; line-height: 1.5; font-weight: bold; }
+        .res-danger-bbl { background: #ffebee; color: var(--danger-red); border: 2px solid #ffcdd2; }
+        .res-safe-bbl { background: #e8f5e9; color: var(--safe-green); border: 2px solid #c8e6c9; }
+
+        footer { text-align: center; padding: 30px; background: #5d4037; color: white; margin-top: 50px; font-size: 0.8rem; line-height: 1.5; }
+
+        /* Responsive HP */
+        @media (max-width: 600px) {
+            .icon-grid { grid-template-columns: repeat(2, 1fr); }
+            nav a { margin: 3px; font-size: 0.75rem; padding: 5px 8px; }
+            .kn-timeline { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>👶 Asuhan Bayi Baru Lahir</h1>
+    <p>Pendamping Ibu Hebat untuk Bayi Sehat</p>
+</header>
+<nav>
+    <a href="index.html">Beranda</a>
+    <a href="kehamilan.html">Kehamilan</a>
+    <a href="persalinan.html">Persalinan</a>
+    <a href="nifas.html">Nifas</a>
+    <a href="bbl.html">Bayi Baru Lahir</a>
+    <a href="KB.html">KB</a>
+    <a href="jurnal.html">Jurnal Kesehatan</a>
+    <a href="tanya ibu.html">Lulleca AI</a>
+	 <a href="gizi.html">Lulleca Gizi</a>
+</nav>
+<div class="container">
+
+    <div class="card">
+        <h2>✨ Asuhan Bayi Normal (Standar KIA)</h2>
+        <p style="font-size: 0.85rem; color: #666;">Segera setelah lahir, pastikan bayi mendapatkan:</p>
+        <div class="icon-grid">
+            <div class="icon-item">
+                <img src="bleeding_kehamilan.PNG" alt="Suhu">
+                <b>Kehangatan</b>
+                <p>Keringkan & kontak kulit ke kulit (IMD).</p>
+            </div>
+            <div class="icon-item">
+                <img src="breast-feed.PNG" alt="ASI">
+                <b>ASI Eksklusif</b>
+                <p>Kolostrum sangat penting bagi imun.</p>
+            </div>
+            <div class="icon-item">
+                <img src="umbilical.PNG" alt="Tali Pusat">
+                <b>Rawat Tali Pusat</b>
+                <p>Tetap kering, bersih, dan terbuka.</p>
+            </div>
+            <div class="icon-item">
+                <img src="scissor.PNG" alt="DCC">
+                <b>DCC</b>
+                <p>Penundaan potong tali pusat (Buku KIA).</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>🧼 Perawatan Tali Pusat (Langkah Aman)</h2>
+        
+        <div class="step-box">
+            <div class="step-number">1</div>
+            <div><b>Cuci Tangan:</b> Gunakan sabun & air mengalir sebelum memegang tali pusat.</div>
+        </div>
+        <div class="step-box">
+            <div class="step-number">2</div>
+            <div><b>Biarkan Terbuka:</b> Jangan dibungkus kassa ketat. Jangan beri alkohol/betadine/ramuan.</div>
+        </div>
+        <div class="step-box">
+            <div class="step-number">3</div>
+            <div><b>Posisi Popok:</b> Pasang popok di bawah tali pusat agar tidak terkena kencing/tinja.</div>
+        </div>
+        <div class="step-box">
+            <div class="step-number">4</div>
+            <div><b>Kebersihan:</b> Jika kotor, cuci dengan air matang & sabun, lalu keringkan sampai benar-benar kering.</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📅 Jadwal Kunjungan Neonatal (KN)</h2>
+        <p style="font-size: 0.85rem;">Pastikan bayi diperiksa Tenaga Kesehatan pada:</p>
+        
+        <div class="kn-timeline">
+            <div class="kn-box"><b>KN 1</b><br><small>6 - 48 Jam</small></div>
+            <div class="kn-box"><b>KN 2</b><br><small>Hari 3 - 7</small></div>
+            <div class="kn-box"><b>KN 3</b><br><small>Hari 8 - 28</small></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>🍼 Catatan Menyusu (Log)</h2>
+        <div class="log-container">
+            <div class="log-btn-group">
+                <button class="btn-log btn-kiri" onclick="addLog('Kiri')">Payudara KIRI</button>
+                <button class="btn-log btn-kanan" onclick="addLog('Kanan')">Payudara KANAN</button>
+            </div>
+            <ul id="logList" class="log-list">
+                <li style="color: #999; text-align: center; margin-top: 10px;">Belum ada catatan hari ini.</li>
+            </ul>
+            <button onclick="clearLog()" style="background:none; border:none; color:#999; font-size: 0.7rem; cursor:pointer; width:100%; text-align:right;">🗑️ Hapus Riwayat</button>
+        </div>
+    </div>
+
+    <div class="card" style="border-top: 6px solid var(--danger-red);">
+        <h2>🔍 Skrining Tanda Bahaya (Waspada!)</h2>
+        <p style="font-size: 0.8rem; color: #666;">Berdasarkan poin pemantauan mandiri Buku KIA:</p>
+        <div class="table-wrapper">
+            <table id="tableNeonatus">
+                <thead><tr><th>Kondisi Bayi</th><th style="text-align:center;">Ya</th><th style="text-align:center;">Tidak</th></tr></thead>
+                <tbody>
+                    <tr><td>Sesak / napas cepat / dada tertarik ke dalam</td><td align="center"><input type="radio" name="b1" value="ya"></td><td align="center"><input type="radio" name="b1" value="tidak" checked></td></tr>
+                    <tr><td>Lemah / tidak bergerak / merintih</td><td align="center"><input type="radio" name="b2" value="ya"></td><td align="center"><input type="radio" name="b2" value="tidak" checked></td></tr>
+                    <tr><td>Kulit biru / pucat / tampak seperti marmer</td><td align="center"><input type="radio" name="b3" value="ya"></td><td align="center"><input type="radio" name="b3" value="tidak" checked></td></tr>
+                    <tr><td>Hisapan lemah / muntah hijau / kencing < 6x sehari</td><td align="center"><input type="radio" name="b4" value="ya"></td><td align="center"><input type="radio" name="b4" value="tidak" checked></td></tr>
+                    <tr><td>Kejang / mata mendelik / mulut mencucu</td><td align="center"><input type="radio" name="b5" value="ya"></td><td align="center"><input type="radio" name="b5" value="tidak" checked></td></tr>
+                    <tr><td>Demam (>37,5°C) atau Dingin (<36,5°C)</td><td align="center"><input type="radio" name="b6" value="ya"></td><td align="center"><input type="radio" name="b6" value="tidak" checked></td></tr>
+                    <tr><td>Belum BAB >48 jam / BAB encer / warna dempul</td><td align="center"><input type="radio" name="b7" value="ya"></td><td align="center"><input type="radio" name="b7" value="tidak" checked></td></tr>
+                    <tr><td>Tali pusat kemerahan / bernanah / berbau</td><td align="center"><input type="radio" name="b8" value="ya"></td><td align="center"><input type="radio" name="b8" value="tidak" checked></td></tr>
+                    <tr><td>Mata merah & bernanah / Kulit bintil nanah</td><td align="center"><input type="radio" name="b9" value="ya"></td><td align="center"><input type="radio" name="b9" value="tidak" checked></td></tr>
+                    <tr><td>Belum mendapat imunisasi HB0 atau BCG</td><td align="center"><input type="radio" name="b10" value="ya"></td><td align="center"><input type="radio" name="b10" value="tidak" checked></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <button class="btn-check-bbl" onclick="cekKondisiBayi()">Cek & Lapor Kondisi Bayi</button>
+        <div id="hasilNeonatus" class="res-bbl"></div>
+    </div>
+</div>
+
+<footer>
+    <b>Kaiyisah Nadiya Hafizah</b><br>
+    Asuhan Kebidanan Komprehensif di Puskesmas Simpang Rimba<br>
+    Lullaby.eca 2026
+</footer>
+
+<script>
+    // --- 1. KONFIGURASI TELEGRAM ---
+    const TELEGRAM_TOKEN = "8151365194:AAFMl_JKjNFVTvo_8sJvhuieE1HnXZRaySc";
+    const TELEGRAM_CHAT_ID = "6435649470";
+
+    // --- 2. AMBIL DATA IDENTITAS LOGIN ---
+    const namaUser = localStorage.getItem('user_nama') || "Bunda Tanpa Nama";
+    const waUser = localStorage.getItem('user_wa') || "Tidak ada No WA";
+
+    // --- 3. FUNGSI KIRIM LAPORAN (FORMAT SESUAI PERMINTAAN) ---
+    async function kirimLaporan(keterangan) {
+        const pesanLengkap = `👶 <b>LAPORAN BBL LULLABY.ECA</b>\n` +
+                             `----------------------------\n` +
+                             `👤 <b>Nama:</b> ${namaUser}\n` +
+                             `📱 <b>WA:</b> ${waUser}\n` +
+                             `📝 <b>Keterangan:</b>\n${keterangan}\n` +
+                             `----------------------------`;
+
+        const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+        try {
+            await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    chat_id: TELEGRAM_CHAT_ID, 
+                    text: pesanLengkap, 
+                    parse_mode: "HTML" 
+                })
+            });
+        } catch (e) {
+            console.error("Gagal kirim laporan.");
+        }
+    }
+
+    // --- 4. FITUR LOG MENYUSUI ---
+    function addLog(sisi) {
+        const logList = document.getElementById('logList');
+        if (logList.innerHTML.includes("Belum ada catatan")) logList.innerHTML = "";
+        const waktu = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        const li = document.createElement('li');
+        li.className = 'log-item';
+        li.innerHTML = `<span>Sisi: <b>${sisi}</b></span> <span>🕒 ${waktu} WIB</span>`;
+        logList.insertBefore(li, logList.firstChild);
+        
+        // Kirim Laporan Menyusui
+        kirimLaporan(`🍼 <b>LOG MENYUSUI</b>\nSisi: <b>${sisi}</b>\nJam: ${waktu} WIB`);
+        saveToStorage(sisi, waktu);
+    }
+
+    // --- 5. FITUR CEK KONDISI BAYI ---
+    function cekKondisiBayi() {
+        let yaCount = 0;
+        let ringkasan = "";
+        document.querySelectorAll('#tableNeonatus tbody tr').forEach(row => {
+            if(row.querySelector('input[value="ya"]').checked) {
+                yaCount++;
+                ringkasan += `• ${row.cells[0].innerText}\n`;
+            }
+        });
+
+        const res = document.getElementById('hasilNeonatus');
+        res.style.display = "block";
+        
+        if(yaCount >= 1) {
+            res.className = "res-bbl res-danger-bbl";
+            res.innerHTML = "⚠️ <b>KESIMPULAN BAHAYA:</b><br>Ditemukan tanda bahaya pada bayi. SEGERA bawa bayi ke Puskesmas Simpang Rimba atau RS terdekat!";
+            kirimLaporan(`🚨 <b>DARURAT BAYI!</b>\nGejala:\n${ringkasan}\n<b>Tindakan: Segera ke Tenaga Kesehatan!</b>`);
+        } else {
+            res.className = "res-bbl res-safe-bbl";
+            res.innerHTML = "✅ <b>KONDISI NORMAL:</b><br>Hasil pantauan menunjukkan bayi dalam kondisi sehat. Tetap jaga kehangatan dan berikan ASI.";
+            kirimLaporan(`✅ <b>SKRINING BAYI SEHAT</b>\nHasil pantauan menunjukkan kondisi normal.`);
+        }
+    }
+
+    // --- 6. PENYIMPANAN LOCALSTORAGE ---
+    function saveToStorage(sisi, waktu) {
+        let logs = JSON.parse(localStorage.getItem('asilog_bbl')) || [];
+        logs.unshift({sisi, waktu});
+        localStorage.setItem('asilog_bbl', JSON.stringify(logs.slice(0, 10)));
+    }
+
+    function clearLog() {
+        if(confirm("Hapus semua riwayat?")) {
+            document.getElementById('logList').innerHTML = '<li style="color: #999; text-align: center; margin-top: 10px;">Belum ada catatan hari ini.</li>';
+            localStorage.removeItem('asilog_bbl');
+        }
+    }
+
+    window.onload = function() {
+        let logs = JSON.parse(localStorage.getItem('asilog_bbl'));
+        if(logs && logs.length > 0) {
+            const logList = document.getElementById('logList');
+            logList.innerHTML = "";
+            logs.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'log-item';
+                li.innerHTML = `<span>Sisi: <b>${item.sisi}</b></span> <span>🕒 ${item.waktu} WIB</span>`;
+                logList.appendChild(li);
+            });
+        }
+    }
+</script>
+</body>
+</html>

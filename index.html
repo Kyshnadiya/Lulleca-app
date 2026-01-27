@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+	<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#d187f5">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beranda - Lullaby.eca</title>
+    <style>
+        /* TEMA UNGU MUDA & PASTEL */
+        :root {
+            --ungu-utama: #d187f5;
+            --ungu-muda: #f3e5f5;
+            --ungu-tua: #8e44ad;
+            --pink-soft: #fce4ec;
+            --teks: #4a4a4a;
+            --hijau-daun: #81c784;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            line-height: 1.6; 
+            margin: 0; 
+            padding: 0; 
+            color: var(--teks); 
+            background-color: #faf5ff; 
+        }
+
+        header { 
+            background: linear-gradient(135deg, var(--ungu-tua), var(--ungu-utama)); 
+            color: white; 
+            padding: 2rem 1rem; 
+            text-align: center; 
+            border-bottom: 5px solid #e1bee7;
+        }
+
+        /* Running Text */
+        .marquee-container {
+            background: var(--pink-soft);
+            color: var(--ungu-tua);
+            padding: 8px 0;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border-bottom: 2px solid var(--ungu-muda);
+        }
+
+        nav { 
+            background: white; 
+            padding: 1rem; 
+            text-align: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        
+        nav a { 
+            color: var(--ungu-tua); 
+            margin: 0 10px; 
+            text-decoration: none; 
+            font-weight: bold; 
+            font-size: 0.85rem;
+        }
+
+        .container { padding: 20px; max-width: 900px; margin: auto; }
+
+        /* BIODATA SECTION */
+        .profile-card {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(142, 68, 173, 0.1);
+            margin-bottom: 30px;
+            border: 2px solid var(--ungu-muda);
+        }
+
+        .profile-img {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            border: 5px solid var(--ungu-muda);
+            object-fit: cover;
+            margin-bottom: 15px;
+        }
+
+        .video-box {
+            margin-top: 20px;
+            background: #fdf7ff;
+            border: 2px dashed var(--ungu-utama);
+            border-radius: 15px;
+            padding: 40px 10px;
+            color: var(--ungu-tua);
+        }
+
+        /* QUICK ACCESS BOXES */
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .quick-item {
+            background: white;
+            padding: 15px;
+            border-radius: 20px;
+            text-align: center;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border: 1px solid var(--ungu-muda);
+            transition: 0.3s;
+        }
+        .quick-item:hover { transform: translateY(-5px); border-color: var(--ungu-utama); }
+        .quick-item span { font-size: 2rem; display: block; }
+        .quick-item p { margin: 5px 0 0; font-size: 0.8rem; font-weight: bold; color: var(--ungu-tua); }
+
+        /* THE JOURNEY / ALUR CoC */
+        .journey-container {
+            background: white;
+            padding: 25px;
+            border-radius: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .journey-map {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .journey-step { flex: 1; position: relative; z-index: 2; }
+        .journey-step img { width: 40px; }
+        .journey-step p { font-size: 0.65rem; font-weight: bold; margin-top: 5px; }
+
+        .line {
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            right: 10%;
+            height: 3px;
+            background: var(--ungu-muda);
+            z-index: 1;
+        }
+
+        /* BAB I & SDG SECTION */
+        .card { 
+            background: white; 
+            padding: 25px; 
+            border-radius: 25px; 
+            margin-bottom: 25px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+        }
+
+        .highlight-title {
+            background: var(--ungu-muda);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            color: var(--ungu-tua);
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        /* STYLE TABEL GANTT CHART */
+        .gantt-table-wrapper {
+            width: 100%;
+            overflow-x: auto; 
+            margin-top: 15px;
+        }
+
+        .gantt-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 15px;
+            overflow: hidden;
+            font-size: 0.8rem;
+            border: 1px solid var(--ungu-muda);
+        }
+
+        .gantt-table th {
+            background-color: var(--ungu-utama);
+            color: white;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .gantt-table td {
+            padding: 10px;
+            border: 1px solid var(--ungu-muda);
+            text-align: center;
+        }
+
+        .filled {
+            background-color: var(--ungu-muda);
+            color: var(--ungu-tua);
+            font-weight: bold;
+            font-size: 1.2rem;
+            animation: fadeIn 2s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .gantt-table tr:hover { background-color: #fdf7ff;}
+
+        /* STYLE PETA ILUSTRASI SIMPANG RIMBA */
+        .map-area {
+            position: relative;
+            width: 100%;
+            height: 450px;
+            background: #aeddf2; 
+            border-radius: 30px;
+            overflow: hidden;
+            border: 4px solid white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: 15px;
+        }
+
+        .island {
+            position: absolute;
+            width: 85%;
+            height: 95%;
+            background: #9bd38a; 
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            border-radius: 40% 10% 20% 60% / 50% 10% 20% 50%;
+            border-left: 8px solid #f0e4d4; 
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+        }
+
+        .region-name {
+            position: absolute;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #4a4a4a;
+            text-shadow: 1px 1px white;
+        }
+
+        .house { font-size: 1.2rem; position: absolute; }
+        .tree { font-size: 0.8rem; position: absolute; opacity: 0.7; }
+
+        .main-pin {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            z-index: 100;
+            text-align: center;
+            transform: translate(-50%, -50%);
+        }
+
+        .pin-icon {
+            font-size: 2.5rem;
+            display: block;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
+            animation: bounce 2s infinite;
+        }
+
+        .pulse-effect {
+            position: absolute;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 10px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .pulse-effect::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--ungu-tua);
+            border-radius: 50%;
+            animation: mapPulse 1.5s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes mapPulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(4); opacity: 0; }
+        }
+
+        .label-puskesmas {
+            background: white;
+            color: #d63031;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            white-space: nowrap;
+        }
+
+        /* --- STYLE BARU: CHECKLIST DAUN KATUK --- */
+        .katuk-tracker {
+            background: #f1f8e9;
+            border: 2px solid var(--hijau-daun);
+            border-radius: 20px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .katuk-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+        .katuk-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .katuk-day {
+            background: white;
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #e8f5e9;
+        }
+        .katuk-day h5 { margin: 0 0 8px 0; color: #388e3c; font-size: 0.85rem; }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+        .checkbox-item input { accent-color: var(--hijau-daun); cursor: pointer; }
+        .checkbox-item span.done { text-decoration: line-through; color: #888; }
+
+        .sdg-box {
+            display: flex;
+            align-items: center;
+            background: #34495e;
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            margin-top: 10px;
+        }
+
+        .countdown {
+            background: var(--ungu-tua);
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        footer { text-align: center; padding: 25px; background: #2c3e50; color: white; font-size: 0.8rem; }
+
+        @media (max-width: 600px) {
+            .journey-map { flex-wrap: wrap; gap: 10px; }
+            .journey-step { flex: 0 0 30%; }
+            .line { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loginOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--ungu-utama); z-index: 9999; display: flex; align-items: center; justify-content: center; text-align: center;">
+    <div style="background: white; padding: 30px; border-radius: 25px; width: 85%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+        <img src="https://cdn-icons-png.flaticon.com/512/2382/2382533.png" style="width: 80px; margin-bottom: 15px;">
+        <h2 id="loginTitle" style="color: var(--ungu-tua); margin-bottom: 5px;">Selamat Datang di Lullaby.eca</h2>
+        <p id="loginDesc" style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">Daftar dulu ya Bun, nanti Bidan Kaiyisah akan memberikan akses masuk.</p>
+        
+        <input type="text" id="namaBunda" placeholder="Nama Lengkap Bunda" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid var(--ungu-muda); border-radius: 12px; outline: none; box-sizing: border-box;">
+        <input type="number" id="idBunda" placeholder="Nomor WA Bunda" style="width: 100%; padding: 12px; margin-bottom: 20px; border: 2px solid var(--ungu-muda); border-radius: 12px; outline: none; box-sizing: border-box;">
+        
+        <button id="btnAksi" onclick="daftarAplikasi()" style="width: 100%; background: var(--ungu-tua); color: white; border: none; padding: 15px; border-radius: 50px; font-weight: bold; font-size: 1rem; cursor: pointer;">
+            Daftar Sekarang
+        </button>
+        
+        <div id="statusPending" style="display:none; margin-top: 15px; padding: 10px; background: #fff3cd; color: #856404; border-radius: 10px; font-size: 0.75rem;">
+            Pendaftaran terkirim! Silakan hubungi Bidan Kaiyisah untuk aktivasi akun Bunda.
+        </div>
+    </div>
+</div>
+
+
+<header>
+    <h1>Lullaby.eca</h1>
+    <p>Inovasi Digital Asuhan Kebidanan Komprehensif</p>
+</header>
+
+<div class="marquee-container">
+    <marquee scrollamount="5">
+        ✨ Ayo kunjungan ANC minimal 6 kali! ✨ Berikan ASI Eksklusif untuk buah hati tercinta ✨ Sehat Ibunya, Ceria Bayinya ✨
+    </marquee>
+</div>
+
+<nav>
+    <a href="index.html">Beranda</a>
+    <a href="kehamilan.html">Kehamilan</a>
+    <a href="persalinan.html">Persalinan</a>
+    <a href="nifas.html">Nifas</a>
+    <a href="bbl.html">Bayi Baru Lahir</a>
+    <a href="KB.html">KB</a>
+    <a href="jurnal.html">Jurnal Kesehatan</a>
+    <a href="tanya ibu.html">Lulleca AI</a>
+	 <a href="gizi.html">Lulleca Gizi</a>
+</nav>
+
+<div class="container">
+
+    <div class="profile-card">
+        <img src="profil.jpeg" alt="Foto Kaiyisah" class="profile-img" id="profil-tombol" onclick="bukaPresentasi()" style="cursor: pointer;">
+
+<script>
+    function bukaPresentasi() {
+        window.location.href = 'presentasi.html';
+    }
+</script>
+   <h2 style="color: var(--ungu-tua); margin: 15px 0 5px 0; font-size: 1.5rem;">Kaiyisah Nadiya Hafizah</h2>
+<p style="margin: 0; font-weight: bold; color: #888; letter-spacing: 1px;">NIM: 231540145</p>
+<p style="margin: 5px 0;">Prodi Kebidanan Semester 6</p>
+<p style="color: var(--ungu-tua); font-weight: bold; margin-bottom: 20px;">Poltekkes Kemenkes Pangkalpinang</p>
+
+<div style="margin: 25px 0; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+    <a href="https://www.instagram.com/kyshnadiya__" target="_blank" style="text-decoration: none; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; padding: 10px 20px; border-radius: 50px; font-size: 0.85rem; font-weight: bold; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(225, 48, 108, 0.3); transition: 0.3s;">
+        <span>📸</span> Instagram
+    </a>
+    
+    <a href="https://wa.me/6287765736200" target="_blank" style="text-decoration: none; background: #25D366; color: white; padding: 10px 20px; border-radius: 50px; font-size: 0.85rem; font-weight: bold; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); transition: 0.3s;">
+        <span>📞</span> WhatsApp
+    </a>
+</div>
+
+<div class="card" style="text-align: center; border: 2px solid var(--ungu-utama); margin: 30px 0; padding: 20px; background-color: #fff;">
+    <h4 style="color: var(--ungu-tua); margin-top: 0; margin-bottom: 10px; font-size: 1.1rem;">🔔 Aktifkan Pengingat Kesehatan</h4>
+    <p style="font-size: 0.85rem; margin-bottom: 20px; color: #666; line-height: 1.4;">Dapatkan notifikasi jadwal ANC dan tips harian langsung di HP Bunda!</p>
+    <button onclick="mintaIzinNotif()" style="background: var(--ungu-tua); color: white; border: none; padding: 12px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(142, 68, 173, 0.2);">
+        Aktifkan Sekarang
+    </button>
+</div>
+
+        <div class="katuk-tracker">
+            <div class="katuk-header">
+                <span style="font-size: 1.5rem;">🌿</span>
+                <h4 style="margin: 0;">Pengingat Rebusan Daun Katuk</h4>
+            </div>
+            <p style="font-size: 0.75rem; color: #4e342e; margin-bottom: 12px;">Minum pagi & malam (Hari ke-3 sampai ke-6 nifas)</p>
+            
+            <div class="katuk-grid">
+                <div class="katuk-day">
+                    <h5>Hari ke-3</h5>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="h3_pagi" onchange="simpanProgress(this)"> Pagi
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="h3_malam" onchange="simpanProgress(this)"> Malam
+                    </label>
+                </div>
+                <div class="katuk-day">
+                    <h5>Hari ke-4</h5>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="h4_pagi" onchange="simpanProgress(this)"> Pagi
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="h4_malam" onchange="simpanProgress(this)"> Malam
+                    </label>
+                </div>
+                <div class="katuk-day">
+                    <h5>Hari ke-5</h5>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="h5_pagi" onchange="simpanProgress(this)"> Pagi
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="h5_malam" onchange="simpanProgress(this)"> Malam
+                    </label>
+                </div>
+                <div class="katuk-day">
+                    <h5>Hari ke-6</h5>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="h6_pagi" onchange="simpanProgress(this)"> Pagi
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="h6_malam" onchange="simpanProgress(this)"> Malam
+                    </label>
+                </div>
+            </div>
+            <p id="katuk-status" style="font-size: 0.7rem; text-align: center; margin-top: 10px; color: #388e3c; font-weight: bold;"></p>
+        </div>
+		
+		<div class="katuk-tracker" style="background: #fff5f5; border-color: #ff8a80; margin-top: 15px;">
+    <div class="katuk-header" style="color: #d32f2f;">
+        <span style="font-size: 1.5rem;">💊</span>
+        <h4 style="margin: 0;">Tracker Tablet Tambah Darah</h4>
+    </div>
+    <p style="font-size: 0.75rem; color: #b71c1c; margin-bottom: 12px;">Minum 1 tablet setiap malam sebelum tidur (Minimal 90 hari)</p>
+    
+    <div style="display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; background: white; padding: 10px; border-radius: 12px;">
+        <script>
+            for (let i = 1; i <= 14; i++) {
+                document.write(`
+                    <div style="text-align: center; border: 1px solid #ffcdd2; padding: 5px; border-radius: 8px; width: 40px;">
+                        <span style="font-size: 0.6rem; display: block; color: #e57373;">Hari ${i}</span>
+                        <input type="checkbox" id="ttd_${i}" onchange="simpanProgress(this)" style="accent-color: #d32f2f;">
+                    </div>
+                `);
+            }
+        </script>
+    </div>
+    <p id="ttd-status" style="font-size: 0.7rem; text-align: center; margin-top: 10px; color: #d32f2f; font-weight: bold;"></p>
+</div>
+
+        <div class="quick-grid">
+            <a href="Kehamilan.html" class="quick-item"><span>🤰</span><p>Kehamilan</p></a>
+            <a href="Persalinan.html" class="quick-item"><span></span>🏥<p>Persalinan</p></a>
+            <a href="bbl.html" class="quick-item"><span>👶</span><p>Bayi Baru Lahir</p></a>
+            <a href="nifas.html" class="quick-item"><span>🌿</span><p>Nifas</p></a>
+            <a href="KB.html" class="quick-item"><span>💉</span><p>KB</p></a>
+            <a href="jurnal.html" class="quick-item"><span>👩‍⚕️</span><p>Kunjungan dan Pemantauan</p></a>
+            <a href="tanya ibu.html" class="quick-item"><span>📝</span><p>Lulleca AI</p></a>
+			
+        </div>
+        <p style="font-style: italic; color: var(--ungu-tua);">"Bidan Sahabat Ibu, Teman Sehat Bayi" ❤️</p>
+    </div>
+
+    <div class="journey-container">
+        <h3 style="color: var(--ungu-tua); margin-top: 0;">The Journey of CoC ✨</h3>
+        <div class="journey-map">
+            <div class="line"></div>
+            <div class="journey-step"><img src="hamil_beranda.png"><p>Hamil</p></div>
+            <div class="journey-step"><img src="bersalin_beranda.png"><p>Bersalin</p></div>
+            <div class="journey-step"><img src="bbl_beranda.png"><p>Bayi</p></div>
+            <div class="journey-step"><img src="nifas_beranda.png"><p>Nifas</p></div>
+            <div class="journey-step"><img src="kb_beranda.png"><p>KB</p></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 style="color: var(--ungu-tua);">Pendahuluan & Inovasi</h3>
+        <div class="highlight-title">"Asuhan Kebidanan Komprehensif di Puskesmas Simpang Rimba Tahun 2026"</div>
+        <p style="font-size: 0.85rem;"><b>Latar Belakang:</b> Menurunkan AKI & AKB adalah target utama SDGs 2030. Di Puskesmas Simpang Rimba, kesenjangan K1-K6 mencapai 32,3%. Inovasi ini hadir untuk menjaga kesinambungan asuhan melalui platform <b>Lullaby.eca</b>.</p>
+        <p style="font-size: 0.85rem;"><b>Rumusan Masalah:</b> Bagaimana penerapan asuhan komprehensif dengan pendokumentasian SOAP di Puskesmas Simpang Rimba?</p>
+
+        <h4 style="color: var(--ungu-tua); margin-bottom: 10px;">📅 Jadwal Kegiatan LTA 2026</h4>
+        <div class="gantt-table-wrapper">
+            <table class="gantt-table">
+                <thead>
+                    <tr>
+                        <th>Jenis Kegiatan</th>
+                        <th>Jan</th>
+                        <th>Feb</th>
+                        <th>Mar</th>
+                        <th>Apr</th>
+                        <th>Mei</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td style="text-align: left;">Penyusunan Proposal</td><td class="filled">✨</td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td style="text-align: left;">Pengumpulan Data (CoC)</td><td></td><td class="filled">✨</td><td class="filled">✨</td><td class="filled">✨</td><td></td></tr>
+                    <tr><td style="text-align: left;">Asuhan Kebidanan</td><td></td><td class="filled">✨</td><td class="filled">✨</td><td class="filled">✨</td><td></td></tr>
+                    <tr><td style="text-align: left;">Penyusunan Laporan</td><td></td><td></td><td></td><td class="filled">✨</td><td class="filled">✨</td></tr>
+                    <tr><td style="text-align: left;">Ujian Tugas Akhir</td><td></td><td></td><td></td><td></td><td class="filled" style="background-color: var(--ungu-utama); color: white;">🎓</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h4 style="color: var(--ungu-tua); margin-top: 25px; margin-bottom: 5px;">📍 Lokasi Studi Kasus</h4>
+        <div class="map-area">
+            <div class="island">
+                <div class="region-name" style="top: 10%; right: 20%;">Bangkakota</div>
+                <div class="region-name" style="top: 25%; right: 40%;">Rimba</div>
+                <div class="region-name" style="top: 35%; left: 10%;">Radjik</div>
+                <div class="house" style="top: 5%; left: 30%;">🏠</div>
+                <div class="house" style="top: 15%; right: 10%;">🏠</div>
+                <div class="main-pin">
+                    <span class="label-puskesmas">Puskesmas Simpang Rimba</span>
+                    <span class="pin-icon">📍</span>
+                    <div class="pulse-effect"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="text-align: center;">
+        <div class="sdg-box">
+            <img src="https://cdn-icons-png.flaticon.com/512/2382/2382533.png" style="width: 35px; margin-right: 15px;">
+            <div style="font-size: 0.75rem; text-align: left;"><b>SDGs Target:</b> AKI < 70/100.000 KH di tahun 2030.</div>
+        </div>
+        <div class="countdown">⏳ Menuju Target 2030</div>
+    </div>
+
+</div>
+
+<footer>
+    <b>Kaiyisah Nadiya Hafizah</b><br>
+    Asuhan Kebidanan Komprehensif di Puskesmas Simpang Rimba<br>
+    Lullaby.eca 2026
+</footer>
+
+<script>
+    // --- 1. KONFIGURASI UTAMA ---
+    const botToken = "8151365194:AAFMl_JKjNFVTvo_8sJvhuieE1HnXZRaySc"; 
+    const chatId = "6435649470"; 
+    const KODE_RAHASIA = "BIDANPINTAR"; 
+    const PIN_RESET = "1234"; // PIN rahasia Bunda
+    let klikFoto = 0; 
+
+    // --- 2. FUNGSI DAFTAR & LOGIN ---
+    function daftarAplikasi() {
+        const nama = document.getElementById('namaBunda').value;
+        const wa = document.getElementById('idBunda').value;
+        if (nama.trim() === "" || wa.trim() === "") {
+            alert("Bunda, isi Nama dan No WA dulu ya.");
+            return;
+        }
+        const btn = document.getElementById('btnAksi');
+        btn.innerText = "Mengirim...";
+        btn.disabled = true;
+        localStorage.setItem('user_nama', nama);
+        localStorage.setItem('user_wa', wa);
+        localStorage.setItem('status_akses', 'pending');
+        const pesan = `📢 *PERMINTAAN AKSES Lullaby.eca*%0A👤 Nama: ${nama}%0A📱 WA: ${wa}%0A🔑 Kode: ${KODE_RAHASIA}`;
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${pesan}&parse_mode=Markdown`)
+        .then(response => {
+            if(response.ok) {
+                alert("Pendaftaran terkirim! Sekarang masukkan Kode dari Bidan.");
+                cekLogin();
+            } else { throw new Error(); }
+        })
+        .catch(err => {
+            alert("Gagal koneksi. Cek internet ya!");
+            btn.innerText = "Daftar Sekarang";
+            btn.disabled = false;
+        });
+    }
+
+    function cekLogin() {
+        const status = localStorage.getItem('status_akses');
+        const savedNama = localStorage.getItem('user_nama');
+        if (status === 'aktif') {
+            document.getElementById('loginOverlay').style.display = 'none';
+        } else if (status === 'pending') {
+            document.getElementById('loginTitle').innerText = "Verifikasi Akses";
+            document.getElementById('loginDesc').innerHTML = `Halo Bunda <b>${savedNama}</b>, masukkan kode akses:`;
+            document.getElementById('namaBunda').style.display = "none"; 
+            const inputWA = document.getElementById('idBunda');
+            inputWA.type = "text"; inputWA.value = ""; inputWA.placeholder = "Masukkan Kode Rahasia";
+            const btn = document.getElementById('btnAksi');
+            btn.innerText = "Aktifkan Sekarang"; btn.disabled = false;
+            btn.onclick = verifikasiKode; 
+            document.getElementById('statusPending').style.display = 'block';
+        }
+    }
+
+    function verifikasiKode() {
+        const kodeInput = document.getElementById('idBunda').value;
+        if (kodeInput === KODE_RAHASIA) {
+            localStorage.setItem('status_akses', 'aktif');
+            alert("Berhasil! Selamat datang Bunda.");
+            document.getElementById('loginOverlay').style.display = 'none';
+        } else { alert("Kode salah!"); }
+    }
+
+    // --- 3. LOGIKA MENU RAHASIA (5X KLIK FOTO) ---
+    function bukaPresentasi() {
+        klikFoto++;
+        if (klikFoto === 5) {
+            const pin = prompt("🔐 Masukkan PIN Bidan Kaiyisah:");
+            if (pin === PIN_RESET) {
+                const menu = prompt(
+                    "PILIHAN RESET DATA (ADMIN):\n" +
+                    "1. Reset Tracker Daun Katuk\n" +
+                    "2. Reset Tracker TTD\n" +
+                    "3. Reset / Buka Kunci Data Persalinan\n\n" +
+                    "Ketik angka (1/2/3):"
+                );
+
+                if (menu === "1") {
+                    hapusPrefix('h3_'); hapusPrefix('h4_'); hapusPrefix('h5_'); hapusPrefix('h6_');
+                    alert("Data Daun Katuk di-reset!");
+                } else if (menu === "2") {
+                    hapusPrefix('ttd_');
+                    alert("Data TTD di-reset!");
+                } else if (menu === "3") {
+                    localStorage.removeItem('fullDataPersalinan');
+                    localStorage.removeItem('tglLahirPasien');
+                    alert("Data Persalinan dihapus! Input di menu persalinan kini terbuka kembali.");
+                } else if (menu !== null) {
+                    alert("Pilihan tidak tersedia.");
+                }
+                location.reload();
+            } else if (pin !== null) {
+                alert("PIN Salah!");
+            }
+            klikFoto = 0;
+        }
+        setTimeout(() => { klikFoto = 0; }, 3000);
+        // Jika Bunda ingin tetap bisa ke halaman presentasi dengan cara biasa,
+        // biarkan logic redirect di luar blok 'if klikFoto === 5'
+    }
+
+    function hapusPrefix(prefix) {
+        Object.keys(localStorage).forEach(key => {
+            if (key.startsWith(prefix)) localStorage.removeItem(key);
+        });
+    }
+
+    // --- 4. TRACKER & NOTIFIKASI ---
+    function simpanProgress(el) {
+    if (el.checked) {
+        // AMBIL DATA DARI LOCALSTORAGE
+        const namaBunda = localStorage.getItem('user_nama') || "Bunda Tanpa Nama";
+        const waBunda = localStorage.getItem('user_wa') || "Tidak ada No WA";
+        
+        localStorage.setItem(el.id, 'true');
+        el.disabled = true;
+
+        // TENTUKAN JENIS LAPORAN
+        let tipe = el.id.includes('ttd') ? "💊 TABLET TAMBAH DARAH" : "🌿 DAUN KATUK";
+        let detailJadwal = el.id.toUpperCase().replace('_', ' ');
+
+        // PESAN TELEGRAM YANG LEBIH LENGKAP
+        const pesanTele = `✅ *LAPORAN ASUPAN BARU*%0A` +
+                          `----------------------------%0A` +
+                          `👤 *Nama Bunda:* ${namaBunda}%0A` +
+                          `📱 *No. WA:* ${waBunda}%0A` +
+                          `📂 *Kategori:* ${tipe}%0A` +
+                          `📍 *Jadwal:* ${detailJadwal}%0A` +
+                          `⏰ *Waktu:* ${new Date().toLocaleString('id-ID')}%0A` +
+                          `----------------------------`;
+
+        // KIRIM KE TELEGRAM
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${pesanTele}&parse_mode=Markdown`)
+        .then(res => {
+            if(res.ok) console.log("Laporan terkirim!");
+        });
+    }
+    updateStatus();
+}
+
+    function loadProgress() {
+        document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            if (localStorage.getItem(cb.id) === 'true') {
+                cb.checked = true;
+                cb.disabled = true;
+            }
+        });
+        updateStatus();
+    }
+
+    function updateStatus() {
+        const katukCount = document.querySelectorAll('.katuk-day input[type="checkbox"]:checked').length;
+        const ttdCount = document.querySelectorAll('input[id^="ttd_"]:checked').length;
+        if(document.getElementById('katuk-status')) document.getElementById('katuk-status').innerText = `Progres: ${katukCount}/8`;
+        if(document.getElementById('ttd-status')) document.getElementById('ttd-status').innerText = `Progres: ${ttdCount}/14`;
+    }
+// Fungsi untuk memutar suara (pastikan file sound.mp3 ada di folder yang sama)
+function putarSuara() {
+    const audio = new Audio('sound.mp3'); // Ganti dengan nama file suaramu
+    audio.play().catch(e => console.log("Gagal putar suara, butuh interaksi user."));
+}
+
+// Fungsi untuk memunculkan Notifikasi Browser
+function kirimNotifHarian(judul, pesan) {
+    if (Notification.permission === "granted") {
+        navigator.serviceWorker.ready.then(registration => {
+            registration.showNotification(judul, {
+                body: pesan,
+                icon: 'https://cdn-icons-png.flaticon.com/512/2382/2382533.png',
+                vibrate: [200, 100, 200]
+            });
+            putarSuara();
+        });
+    }
+}
+
+// Fungsi Pengecek Jam Otomatis
+function cekJadwalNotifikasi() {
+    const sekarang = new Date();
+    const jam = sekarang.getHours();
+    const menit = sekarang.getMinutes();
+
+    // JAM 09:00 PAGI - Pengingat Daun Katuk
+    if (jam === 9 && menit === 0) {
+        kirimNotifHarian("🌿 Waktunya Daun Katuk!", "Bunda, jangan lupa minum rebusan daun katuk pagi ini ya agar ASI lancar.");
+    }
+
+    // JAM 18:00 SORE - Pengingat TTD & Daun Katuk
+    if (jam === 18 && menit === 0) {
+        kirimNotifHarian("💊 Pengingat Kesehatan", "Bunda, waktunya minum Tablet Tambah Darah dan rebusan daun katuk malam.");
+    }
+}
+
+// Jalankan pengecekan setiap 1 menit (60000ms)
+setInterval(cekJadwalNotifikasi, 60000);
+
+// Definisi fungsi minta izin (yang dipanggil tombol di HTML)
+function mintaIzinNotif() {
+    Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+            alert("Terima kasih! Notifikasi pengingat sudah aktif.");
+            kirimNotifHarian("Lullaby.eca", "Notifikasi berhasil diaktifkan!");
+        } else {
+            alert("Notifikasi ditolak. Bunda tidak akan menerima pengingat otomatis.");
+        }
+    });
+}
+    window.onload = function() {
+        cekLogin();
+        loadProgress();
+    };
+	
+	
+</script>
+
+</body>
+</html>
