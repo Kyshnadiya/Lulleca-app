@@ -123,7 +123,8 @@
         <h3>Pilih Game Bunda</h3>
         <button onclick="startMitosGame()" style="background:var(--sage-accent); color:white; width:100%; margin: 10px 0; padding: 15px;">1. Mitos atau Fakta</button>
         <button onclick="startFlyGame()" style="background:#5cacee; color:white; width:100%; margin: 10px 0; padding: 15px;">2. Fly Bird (Flappy)</button>
-        <button onclick="closeAllModals()" style="background:#ccc; width:100%;">Batal</button>
+<button onclick="startTembakGame()" style="background:#ff7043; color:white; width:100%; margin: 10px 0; padding: 15px;">3. Tembak Kuman</button>
+		<button onclick="closeAllModals()" style="background:#ccc; width:100%;">Batal</button>
     </div>
 </div>
 
@@ -643,16 +644,21 @@
                     endGame();
                 }
             }
-
-            // Hitung Skor
+// Hitung Skor & Cek Menang
             if (p.x === 50) {
                 score++;
                 scoreEl.innerText = score;
+                if (score >= 100) {
+                    gameRunning = false;
+                    alert("Selamat Bunda! Skor sudah 100. Bunda luar biasa! ✨");
+                    closeAllModals();
+                }
                 if (score > bestScore) {
                     bestScore = score;
                     bestEl.innerText = bestScore;
                 }
             }
+            
         });
 
         // Hapus pipa yang sudah lewat & Tambah pipa baru
@@ -676,7 +682,71 @@
     const flap = () => { if(gameRunning) birdV = jump; };
     canvas.addEventListener('mousedown', flap);
     canvas.addEventListener('touchstart', (e) => { flap(); e.preventDefault(); }, {passive: false});
+
+	// --- GAME 3: TEMBAK KUMAN ---
+    let enemies = [];
+    let gameTembakRunning = false;
     
+    function startTembakGame() {
+        closeAllModals();
+        const win = document.getElementById('chat-window');
+        const canvasTembak = document.createElement('canvas');
+        canvasTembak.id = "tembakCanvas";
+        canvasTembak.width = 300; canvasTembak.height = 400;
+        canvasTembak.style.background = "#fff3e0";
+        canvasTembak.style.display = "block";
+        canvasTembak.style.margin = "10px auto";
+        canvasTembak.style.border = "2px solid #689f38";
+        
+        const modal = document.getElementById('menuModal');
+        modal.style.display = 'flex';
+        modal.querySelector('.modal-box').innerHTML = `
+            <h3>Tembak Kuman Jahat 🦠</h3>
+            <p>Ketuk kuman untuk membasminya!</p>
+            <div id="containerTembak"></div>
+            <button onclick="closeAllModals()" style="width:100%; margin-top:10px;">Berhenti</button>
+        `;
+        modal.querySelector('#containerTembak').appendChild(canvasTembak);
+        
+        enemies = [];
+        gameTembakRunning = true;
+        
+        canvasTembak.onclick = function(e) {
+            const rect = canvasTembak.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            enemies = enemies.filter(en => {
+                const dist = Math.hypot(en.x - mouseX, en.y - mouseY);
+                return dist > 20; // Jika jarak klik ke kuman < 20, kuman hilang
+            });
+        };
+
+        function loopTembak() {
+            if(!gameTembakRunning) return;
+            const ctxT = canvasTembak.getContext('2d');
+            ctxT.clearRect(0,0,300,400);
+            
+            if(Math.random() < 0.03) {
+                enemies.push({ x: Math.random()*260+20, y: -20, s: Math.random()*2+1 });
+            }
+            
+            enemies.forEach(en => {
+                en.y += en.s;
+                ctxT.font = "20px Arial";
+                ctxT.fillText("🦠", en.x, en.y);
+            });
+            
+            if(enemies.some(en => en.y > 400)) {
+                gameTembakRunning = false;
+                alert("Yah, kumannya lolos! Ayo jaga kebersihan Bunda.");
+                closeAllModals();
+            }
+            
+            if(gameTembakRunning) requestAnimationFrame(loopTembak);
+        }
+        loopTembak();
+    }
 </script>
 </body>
 </html>
+
