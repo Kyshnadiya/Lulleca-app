@@ -683,70 +683,85 @@
     canvas.addEventListener('mousedown', flap);
     canvas.addEventListener('touchstart', (e) => { flap(); e.preventDefault(); }, {passive: false});
 
-	// --- GAME 3: TEMBAK KUMAN ---
+// --- GAME 3: TEMBAK KUMAN (DENGAN BIDIK & SKOR) ---
     let enemies = [];
     let gameTembakRunning = false;
-    
+    let scoreTembak = 0;
+    let crossX = 150, crossY = 200; // Posisi awal bidikan
+
     function startTembakGame() {
         closeAllModals();
-        const win = document.getElementById('chat-window');
-        const canvasTembak = document.createElement('canvas');
-        canvasTembak.id = "tembakCanvas";
-        canvasTembak.width = 300; canvasTembak.height = 400;
-        canvasTembak.style.background = "#fff3e0";
-        canvasTembak.style.display = "block";
-        canvasTembak.style.margin = "10px auto";
-        canvasTembak.style.border = "2px solid #689f38";
-        
         const modal = document.getElementById('menuModal');
         modal.style.display = 'flex';
         modal.querySelector('.modal-box').innerHTML = `
-            <h3>Tembak Kuman Jahat 🦠</h3>
-            <p>Ketuk kuman untuk membasminya!</p>
+            <h3 style="margin-bottom:5px;">Basmi Kuman Jahat 🦠</h3>
+            <div style="font-weight:bold; color:#d84315; margin-bottom:5px;">Skor: <span id="skorTembak">0</span></div>
             <div id="containerTembak"></div>
-            <button onclick="closeAllModals()" style="width:100%; margin-top:10px;">Berhenti</button>
+            <button onclick="closeAllModals()" style="width:100%; margin-top:10px; background:#2c3e50; color:white;">Berhenti</button>
         `;
+
+        const canvasTembak = document.createElement('canvas');
+        canvasTembak.width = 300; canvasTembak.height = 350;
+        canvasTembak.style.background = "#fff3e0";
+        canvasTembak.style.display = "block";
+        canvasTembak.style.margin = "0 auto";
+        canvasTembak.style.border = "2px solid #ff7043";
+        canvasTembak.style.cursor = "none"; // Sembunyikan kursor asli biar fokus ke bidikan
         modal.querySelector('#containerTembak').appendChild(canvasTembak);
         
+        const ctxT = canvasTembak.getContext('2d');
         enemies = [];
+        scoreTembak = 0;
         gameTembakRunning = true;
-        
-        canvasTembak.onclick = function(e) {
+
+        // Update posisi bidikan saat mouse bergerak atau layar disentuh
+        const updateMouse = (e) => {
             const rect = canvasTembak.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            crossX = clientX - rect.left;
+            crossY = clientY - rect.top;
+        };
+
+        canvasTembak.onmousemove = updateMouse;
+        canvasTembak.ontouchmove = (e) => { updateMouse(e); e.preventDefault(); };
+
+        canvasTembak.onclick = function() {
+            if(!gameTembakRunning) return;
+            let hit = false;
             enemies = enemies.filter(en => {
-                const dist = Math.hypot(en.x - mouseX, en.y - mouseY);
-                return dist > 20; // Jika jarak klik ke kuman < 20, kuman hilang
+                const dist = Math.hypot(en.x - crossX, en.y - (crossY - 5)); 
+                if (dist < 25) { hit = true; return false; }
+                return true;
             });
+            if(hit) {
+                scoreTembak += 10;
+                document.getElementById('skorTembak').innerText = scoreTembak;
+            }
         };
 
         function loopTembak() {
             if(!gameTembakRunning) return;
-            const ctxT = canvasTembak.getContext('2d');
             ctxT.clearRect(0,0,300,400);
             
+            // Munculkan kuman baru
             if(Math.random() < 0.03) {
-                enemies.push({ x: Math.random()*260+20, y: -20, s: Math.random()*2+1 });
+                enemies.push({ x: Math.random()*260+20, y: -20, s: Math.random()*1.5 + 1 });
             }
             
+            // Gambar Kuman
             enemies.forEach(en => {
                 en.y += en.s;
-                ctxT.font = "20px Arial";
+                ctxT.font = "24px Arial";
+                ctxT.textAlign = "center";
                 ctxT.fillText("🦠", en.x, en.y);
             });
-            
-            if(enemies.some(en => en.y > 400)) {
-                gameTembakRunning = false;
-                alert("Yah, kumannya lolos! Ayo jaga kebersihan Bunda.");
-                closeAllModals();
-            }
-            
-            if(gameTembakRunning) requestAnimationFrame(loopTembak);
-        }
-        loopTembak();
-    }
+
+            // --- GAMBAR SISTEM BIDIK (CROSSHAIR) ---
+            ctxT.strokeStyle = "red";
+            ctxT.lineWidth = 2
 </script>
 </body>
 </html>
+
 
