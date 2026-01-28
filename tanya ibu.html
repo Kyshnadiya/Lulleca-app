@@ -120,11 +120,20 @@
 
 <div id="menuModal" class="modal" onclick="closeAllModals(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
-        <h3>Pilih Game Bunda</h3>
-        <button onclick="startMitosGame()" style="background:var(--sage-accent); color:white; width:100%; margin: 10px 0; padding: 15px;">1. Mitos atau Fakta</button>
-        <button onclick="startFlyGame()" style="background:#5cacee; color:white; width:100%; margin: 10px 0; padding: 15px;">2. Fly Bird (Flappy)</button>
-<button onclick="startTembakGame()" style="background:#ff7043; color:white; width:100%; margin: 10px 0; padding: 15px;">3. Tembak Kuman</button>
-		<button onclick="closeAllModals()" style="background:#ccc; width:100%;">Batal</button>
+        <div id="mainMenu">
+            <h3>Pilih Game Bunda</h3>
+            <button onclick="startMitosGame()" style="background:var(--sage-accent); color:white; width:100%; margin: 10px 0; padding: 15px;">1. Mitos atau Fakta</button>
+            <button onclick="startFlyGame()" style="background:#5cacee; color:white; width:100%; margin: 10px 0; padding: 15px;">2. Fly Bird (Skor 100)</button>
+            <button onclick="startTembakGame()" style="background:#ff7043; color:white; width:100%; margin: 10px 0; padding: 15px;">3. Tembak Kuman 🦠</button>
+            <button onclick="closeAllModals()" style="background:#ccc; width:100%;">Batal</button>
+        </div>
+        
+        <div id="gameArea" style="display:none;">
+            <h3 id="gameTitle"></h3>
+            <div id="gameStats" style="font-weight:bold; color:#d84315; margin-bottom:5px;"></div>
+            <div id="containerCanvas" style="position:relative; cursor:none;"></div>
+            <button onclick="backToMenu()" style="width:100%; margin-top:10px; background:#2c3e50; color:white;">Berhenti</button>
+        </div>
     </div>
 </div>
 
@@ -545,12 +554,13 @@
     btn.onclick = kirim;
     input.onkeypress = (e) => { if(e.key === 'Enter') kirim(); };
 
-    // --- MODAL CONTROL ---
-    function openMenu() { document.getElementById('menuModal').style.display = 'flex'; }
-    function closeAllModals() { 
-        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-        gameRunning = false;
-    }
+    function backToMenu() {
+    gameTembakRunning = false;
+    gameRunning = false;
+    document.getElementById('mainMenu').style.display = 'block';
+    document.getElementById('gameArea').style.display = 'none';
+    document.getElementById('containerCanvas').innerHTML = ''; // Bersihkan kanvas lama
+}
 
     // --- GAME 1: MITOS ---
     const games = [
@@ -682,84 +692,99 @@
     const flap = () => { if(gameRunning) birdV = jump; };
     canvas.addEventListener('mousedown', flap);
     canvas.addEventListener('touchstart', (e) => { flap(); e.preventDefault(); }, {passive: false});
-
-// --- GAME 3: TEMBAK KUMAN (DENGAN BIDIK & SKOR) ---
+	
+// --- GAME 3: TEMBAK KUMAN (FIXED VERSION) ---
     let enemies = [];
     let gameTembakRunning = false;
     let scoreTembak = 0;
-    let crossX = 150, crossY = 200; // Posisi awal bidikan
+    let crossX = 150, crossY = 200;
 
-    function startTembakGame() {
-        closeAllModals();
-        const modal = document.getElementById('menuModal');
-        modal.style.display = 'flex';
-        modal.querySelector('.modal-box').innerHTML = `
-            <h3 style="margin-bottom:5px;">Basmi Kuman Jahat 🦠</h3>
-            <div style="font-weight:bold; color:#d84315; margin-bottom:5px;">Skor: <span id="skorTembak">0</span></div>
-            <div id="containerTembak"></div>
-            <button onclick="closeAllModals()" style="width:100%; margin-top:10px; background:#2c3e50; color:white;">Berhenti</button>
-        `;
+  function startTembakGame() {
+    // Tukar tampilan ke area game
+    document.getElementById('mainMenu').style.display = 'none';
+    document.getElementById('gameArea').style.display = 'block';
+    document.getElementById('gameTitle').innerText = "Basmi Kuman Jahat 🦠";
+    document.getElementById('gameStats').innerHTML = 'Skor: <span id="skorTembak">0</span>';
+    
+    const container = document.getElementById('containerCanvas');
+    container.innerHTML = ''; // Bersihkan kalau ada sisa game sebelumnya
+    
+    const canvasTembak = document.createElement('canvas');
+    canvasTembak.width = 300; canvasTembak.height = 350;
+    canvasTembak.style.background = "#fff3e0";
+    canvasTembak.style.display = "block";
+    canvasTembak.style.margin = "0 auto";
+    canvasTembak.style.border = "2px solid #ff7043";
+    container.appendChild(canvasTembak);
+    
+    const ctxT = canvasTembak.getContext('2d');
+    enemies = [];
+    scoreTembak = 0;
+    gameTembakRunning = true;
 
-        const canvasTembak = document.createElement('canvas');
-        canvasTembak.width = 300; canvasTembak.height = 350;
-        canvasTembak.style.background = "#fff3e0";
-        canvasTembak.style.display = "block";
-        canvasTembak.style.margin = "0 auto";
-        canvasTembak.style.border = "2px solid #ff7043";
-        canvasTembak.style.cursor = "none"; // Sembunyikan kursor asli biar fokus ke bidikan
-        modal.querySelector('#containerTembak').appendChild(canvasTembak);
+    function getPos(e) {
+        const rect = canvasTembak.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        crossX = clientX - rect.left;
+        crossY = clientY - rect.top;
+    }
+
+    canvasTembak.onmousemove = getPos;
+    canvasTembak.ontouchmove = (e) => { getPos(e); e.preventDefault(); };
+
+    const tembak = (e) => {
+        getPos(e);
+        let hit = false;
+        enemies = enemies.filter(en => {
+            const dist = Math.hypot(en.x - crossX, (en.y - 10) - crossY); 
+            if (dist < 35) { hit = true; return false; }
+            return true;
+        });
+        if(hit) {
+            scoreTembak += 10;
+            document.getElementById('skorTembak').innerText = scoreTembak;
+            if(scoreTembak >= 200) { // Set skor menang 200
+                gameTembakRunning = false;
+                alert("Hebat Bunda! Tangan sudah bersih dari kuman! ✨");
+                backToMenu();
+            }
+        }
+    };
+
+    canvasTembak.onmousedown = tembak;
+    canvasTembak.ontouchstart = (e) => { tembak(e); e.preventDefault(); };
+
+    function loopTembak() {
+        if(!gameTembakRunning) return;
+        ctxT.clearRect(0,0,300,350);
+        if(Math.random() < 0.04) {
+            enemies.push({ x: Math.random()*260+20, y: -20, s: Math.random()*1.5 + 1 });
+        }
+        enemies.forEach(en => {
+            en.y += en.s;
+            ctxT.font = "28px Arial";
+            ctxT.textAlign = "center";
+            ctxT.fillText("🦠", en.x, en.y);
+        });
+        // Gambar Bidik
+        ctxT.strokeStyle = "red"; ctxT.lineWidth = 2;
+        ctxT.beginPath(); ctxT.arc(crossX, crossY, 15, 0, Math.PI * 2);
+        ctxT.moveTo(crossX - 20, crossY); ctxT.lineTo(crossX + 20, crossY);
+        ctxT.moveTo(crossX, crossY - 20); ctxT.lineTo(crossX, crossY + 20);
+        ctxT.stroke();
         
-        const ctxT = canvasTembak.getContext('2d');
-        enemies = [];
-        scoreTembak = 0;
-        gameTembakRunning = true;
+        if(enemies.some(en => en.y > 350)) {
+            gameTembakRunning = false;
+            alert("Kuman lolos! Ayo cuci tangan ya Bunda. Skor: " + scoreTembak);
+            backToMenu();
+        } else { requestAnimationFrame(loopTembak); }
+    }
+    loopTembak();
+}
 
-        // Update posisi bidikan saat mouse bergerak atau layar disentuh
-        const updateMouse = (e) => {
-            const rect = canvasTembak.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            crossX = clientX - rect.left;
-            crossY = clientY - rect.top;
-        };
+        
 
-        canvasTembak.onmousemove = updateMouse;
-        canvasTembak.ontouchmove = (e) => { updateMouse(e); e.preventDefault(); };
-
-        canvasTembak.onclick = function() {
-            if(!gameTembakRunning) return;
-            let hit = false;
-            enemies = enemies.filter(en => {
-                const dist = Math.hypot(en.x - crossX, en.y - (crossY - 5)); 
-                if (dist < 25) { hit = true; return false; }
-                return true;
-            });
-            if(hit) {
-                scoreTembak += 10;
-                document.getElementById('skorTembak').innerText = scoreTembak;
-            }
-        };
-
-        function loopTembak() {
-            if(!gameTembakRunning) return;
-            ctxT.clearRect(0,0,300,400);
-            
-            // Munculkan kuman baru
-            if(Math.random() < 0.03) {
-                enemies.push({ x: Math.random()*260+20, y: -20, s: Math.random()*1.5 + 1 });
-            }
-            
-            // Gambar Kuman
-            enemies.forEach(en => {
-                en.y += en.s;
-                ctxT.font = "24px Arial";
-                ctxT.textAlign = "center";
-                ctxT.fillText("🦠", en.x, en.y);
-            });
-
-            // --- GAMBAR SISTEM BIDIK (CROSSHAIR) ---
-            ctxT.strokeStyle = "red";
-            ctxT.lineWidth = 2
 </script>
 </body>
 </html>
