@@ -457,7 +457,7 @@
     </button>
 </div>
 
-        <div class="katuk-tracker">
+     <div class="katuk-tracker">
             <div class="katuk-header">
                 <span style="font-size: 1.5rem;">🌿</span>
                 <h4 style="margin: 0;">Pengingat Rebusan Daun Katuk</h4>
@@ -505,27 +505,43 @@
             <p id="katuk-status" style="font-size: 0.7rem; text-align: center; margin-top: 10px; color: #388e3c; font-weight: bold;"></p>
         </div>
 		
-		<div class="katuk-tracker" style="background: #fff5f5; border-color: #ff8a80; margin-top: 15px;">
-    <div class="katuk-header" style="color: #d32f2f;">
-        <span style="font-size: 1.5rem;">💊</span>
-        <h4 style="margin: 0;">Tracker Tablet Tambah Darah</h4>
-    </div>
-    <p style="font-size: 0.75rem; color: #b71c1c; margin-bottom: 12px;">Minum 1 tablet setiap malam sebelum tidur (Minimal 90 hari)</p>
-    
-    <div style="display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; background: white; padding: 10px; border-radius: 12px;">
-        <script>
-            for (let i = 1; i <= 14; i++) {
-                document.write(`
-                    <div style="text-align: center; border: 1px solid #ffcdd2; padding: 5px; border-radius: 8px; width: 40px;">
-                        <span style="font-size: 0.6rem; display: block; color: #e57373;">Hari ${i}</span>
-                        <input type="checkbox" id="ttd_${i}" onchange="simpanProgress(this)" style="accent-color: #d32f2f;">
-                    </div>
-                `);
-            }
-        </script>
-    </div>
-    <p id="ttd-status" style="font-size: 0.7rem; text-align: center; margin-top: 10px; color: #d32f2f; font-weight: bold;"></p>
-</div>
+        <div class="katuk-tracker" style="background: #fff5f5; border-color: #ff8a80; margin-top: 15px;">
+            <div class="katuk-header" style="color: #d32f2f;">
+                <span style="font-size: 1.5rem;">💊</span>
+                <h4 style="margin: 0;">Tracker Tablet Tambah Darah</h4>
+            </div>
+            <p style="font-size: 0.75rem; color: #b71c1c; margin-bottom: 12px;">Hari 1-4: 1 tablet/hari | Hari 5-14: 2 tablet/hari (Total: 24 Tablet)</p>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; background: white; padding: 12px; border-radius: 12px;">
+                <script>
+                    // Periode 1: Hari 1 s.d 4 (Dosis 1 Tablet per hari)
+                    for (let i = 1; i <= 4; i++) {
+                        document.write(`
+                            <div style="text-align: center; border: 1px solid #ffcdd2; padding: 5px; border-radius: 8px; width: 55px; background: #fffde7;">
+                                <span style="font-size: 0.6rem; display: block; color: #e57373; font-weight: bold;">Hari ${i}</span>
+                                <span style="font-size: 0.55rem; display: block; color: #795548; margin-bottom: 2px;">(1 Tab)</span>
+                                <input type="checkbox" id="ttd_h${i}_t1" onchange="simpanProgress(this)" style="accent-color: #d32f2f;">
+                            </div>
+                        `);
+                    }
+
+                    // Periode 2: Hari 5 s.d 14 (Dosis 2 Tablet per hari)
+                    for (let i = 5; i <= 14; i++) {
+                        document.write(`
+                            <div style="text-align: center; border: 1px solid #ffbaf2; padding: 5px; border-radius: 8px; width: 55px; background: #f3e5f5;">
+                                <span style="font-size: 0.6rem; display: block; color: #ab47bc; font-weight: bold;">Hari ${i}</span>
+                                <span style="font-size: 0.55rem; display: block; color: #795548; margin-bottom: 2px;">(2 Tab)</span>
+                                <div style="display: flex; gap: 4px; justify-content: center;">
+                                    <input type="checkbox" id="ttd_h${i}_t1" onchange="simpanProgress(this)" style="accent-color: #d32f2f;" title="Tablet 1">
+                                    <input type="checkbox" id="ttd_h${i}_t2" onchange="simpanProgress(this)" style="accent-color: #d32f2f;" title="Tablet 2">
+                                </div>
+                            </div>
+                        `);
+                    }
+                </script>
+            </div>
+            <p id="ttd-status" style="font-size: 0.7rem; text-align: center; margin-top: 10px; color: #d32f2f; font-weight: bold;"></p>
+        </div>
 
         <div class="quick-grid">
             <a href="kehamilan.html" class="quick-item"><span>🤰</span><p>Kehamilan</p></a>
